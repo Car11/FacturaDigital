@@ -9,12 +9,12 @@ class log{
     private static $evento='';
     private static $detalle='';
     private static $usuario='Sistema';
-    //
+    // linux path
     /*private static $path='/var/www/html/log/xLog.xml';
     private static $dirpath='/var/www/html/log';
     private static $dirHistpath='/var/www/html/log/Historico';
     private static $dirHistpathRename= '/var/www/html/log/Historico/xLog_';*/
-    //
+    // windows path
     private static $path='c:\log\xLog.xml';
     private static $dirpath='c:\log';
     private static $dirHistpath='c:\log\Historico'; 

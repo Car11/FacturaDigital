@@ -3,56 +3,46 @@ if (!isset($_SESSION))
     session_start();
 
 if(isset($_POST["action"])){
-    $producto= new Producto();
+    $categoria= new Categoria();
     switch($_POST["action"]){
         case "LoadAll":
-            echo json_encode($producto->LoadAll());
+            echo json_encode($categoria->LoadAll());
             break;
         case "Load":
-            echo json_encode($producto->Load());
+            echo json_encode($categoria->Load());
             break;
         case "Insert":
-            $producto->Insert();
+            $categoria->Insert();
             break;
         case "Update":
-            $producto->Update();
+            $categoria->Update();
             break;
         case "Delete":
-            echo json_encode($producto->Delete());
+            echo json_encode($categoria->Delete());
             break;   
     }
 }
 
-class Producto{
+class Categoria{
     public $id=null;
     public $nombre='';
-    public $cantidad=0;
-    public $scancode='';
-    public $precio=0;
-    public $codigorapido='';
-    public $idcategoria='';
 
     function __construct(){
         require_once("Conexion.php");
         //require_once("Log.php");
         //require_once('Globals.php');
         //
-        if(isset($_POST["producto"])){
-            $obj= json_decode($_POST["producto"],true);
+        if(isset($_POST["categoria"])){
+            $obj= json_decode($_POST["categoria"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
-            $this->cantidad= $obj["cantidad"] ?? 0;            
-            $this->scancode= $obj["scancode"] ?? '';
-            $this->precio= $obj["precio"] ?? 0;
-            $this->codigorapido= $obj["codigorapido"] ?? 0;
-            $this->idcategoria= $obj["idcategoria"] ?? null;
         }
     }
 
     function LoadAll(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido , idcategoria
-                FROM     producto       
+            $sql='SELECT id, nombre 
+                FROM     categoria       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
             return $data;
@@ -68,8 +58,8 @@ class Producto{
 
     function Load(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria
-                FROM producto  
+            $sql='SELECT id, nombre
+                FROM categoria  
                 where id=:id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql,$param);
@@ -79,17 +69,17 @@ class Producto{
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
-                'msg' => 'Error al cargar el producto'))
+                'msg' => 'Error al cargar el categoria'))
             );
         }
     }
 
     function Insert(){
         try {
-            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria)
-                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria)";              
+            $sql="INSERT INTO categoria   (id, nombre)
+                VALUES (uuid(), :nombre)";              
             //
-            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria);
+            $param= array(':nombre'=>$this->nombre);
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
@@ -108,10 +98,10 @@ class Producto{
 
     function Update(){
         try {
-            $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria
+            $sql="UPDATE categoria 
+                SET nombre=:nombre 
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, 'precio'=>$this->precio , 'codigorapido'=>$this->codigorapido, 'idcategoria'=>$this->idcategoria );
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre );
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
                 return true;
@@ -154,7 +144,7 @@ class Producto{
             //     $sessiondata['msg']='Registro en uso'; 
             //     return $sessiondata;           
             // }                    
-            $sql='DELETE FROM producto  
+            $sql='DELETE FROM categoria  
             WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);

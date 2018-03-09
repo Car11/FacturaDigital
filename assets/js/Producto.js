@@ -1,17 +1,18 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, scancode, cantidad, precio, codigorapido) {
+    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.scancode=scancode || '';
         this.cantidad=cantidad || 0;
-        this.precio=precio || 0;;
+        this.precio=precio || 0;
         this.codigorapido= codigorapido || '';
+        this.idcategoria= idcategoria || null;
     }
 
     //Get
     get Calc() {
-        return this.cantidad * this.precio;
+    return this.cantidad * this.precio;
     }
 }
 
@@ -20,12 +21,15 @@ let producto = new Producto();
 $(document).ready(function () {
     // Load list
     LoadAll();
+    LoadCategories();
     //Form Validate
     $('#frmProducto').validate({
         lang: 'es', 
-        rules: {
-            'id': "required",
-            'nombre': "required"
+        rules: {            
+            'nombre': "required",
+            'cantidad': {
+                minlength:1,maxlength:5
+            }
         },
         submitHandler: function() {
             $('#btnProducto').attr("disabled", "disabled");
@@ -54,6 +58,24 @@ function LoadAll() {
     .done(function (e) {
         CleanCtls();
         showData(e);
+    })
+    .fail(function (e) {
+        showError(e);
+    });
+};
+
+// Carga lista
+function LoadCategories() {
+    $.ajax({
+        type: "POST",
+        url: "class/Categoria.php",
+        data: {
+            action: "LoadAll"
+        }
+    })
+    .done(function (e) {
+        CleanCtls();
+        showDataCategoria(e);
     })
     .fail(function (e) {
         showError(e);
@@ -99,13 +121,26 @@ function showData(e) {
                 '<td>' + item.cantidad + '</td>' +
                 '<td>' + item.precio + '</td>' +
                 '<td>' + item.codigorapido + '</td>' +
-                '<td><img id=btnmodingreso'+ item.id + ' class=borrar src=img/file_mod.png></td>'+
-                '<td><img id=btnborraingreso'+ item.id + ' class=borrar src=img/file_delete.png></td>'+
+                '<td><img id=btnmodingreso'+ item.id + ' src=img/file_mod.png></td>'+
+                '<td><img id=btnborraingreso'+ item.id + ' src=img/file_delete.png></td>'+
             '</tr>';
         $('#tableBody-Producto').append(row);
         // evento click del boton modificar-eliminar
         $('#btnmodingreso' + item.id).click(UpdateEventHandler);
         $('#btnborraingreso' + item.id).click(DeleteEventHandler);
+    })
+};
+
+function showDataCategoria(e) {
+    // carga lista con datos.
+    var data = JSON.parse(e);
+    // Recorre arreglo.
+    $.each(data, function (i, item) {
+        var opt =
+            '<option value="'+ item.id + '">'+ item.nombre + '</option>';
+        $('#categoria').append(opt);
+        // evento click del boton modificar-eliminar
+        //$('#option' + item.id).click(event-handler);
     })
 };
 
@@ -191,13 +226,14 @@ function ShowItemData(e) {
     CleanCtls();    
     // carga objeto.
     var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido);
+    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria);
     // Asigna objeto a controles
     $("#id").val(producto.id);
     $("#nombre").val(producto.nombre);
     $("#precio").val(producto.precio);
     $("#cantidad").val(producto.cantidad);
     $("#codigorapido").val(producto.codigorapido);
+    $("#categoria").val(producto.idcategoria);
 };
 
 function Save(){   
@@ -207,6 +243,7 @@ function Save(){
     producto.cantidad = $("#cantidad").val();
     producto.precio = $("#precio").val();
     producto.codigorapido = $("#codigorapido").val();
+    producto.idcategoria= $("#categoria").val();
     $.ajax({
         type: "POST",
         url: "class/Producto.php",

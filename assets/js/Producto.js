@@ -1,32 +1,44 @@
-// function Producto(id){
-//     this.id=id;
-// }
-
-// function Producto(id, nombre, scancode, cantidad){
-//     this.id=id;
-//     this.nombre=nombre;
-//     this.scancode=scancode;
-//     this.cantidad=cantidad;
-// }
-
-// function Producto(id, nombre){
-//     this.id=id;
-//     this.nombre=nombre;
-// }
-
 class Producto {
-    constructor(id, nombre, scancode='', cantidad=0) {
-        this.id = id;
-        this.nombre = nombre;
-        this.scancode=scancode;
-        this.cantidad=cantidad;
+    // Constructor
+    constructor(id, nombre, scancode, cantidad, precio, codigorapido) {
+        this.id = id || null;
+        this.nombre = nombre || '';
+        this.scancode=scancode || '';
+        this.cantidad=cantidad || 0;
+        this.precio=precio || 0;;
+        this.codigorapido= codigorapido || '';
+    }
+
+    //Get
+    get Calc() {
+        return this.cantidad * this.precio;
     }
 }
 
+let producto = new Producto();
+
 $(document).ready(function () {
-    $('#btnProducto').click(FormValidate);
+    // Load list
     LoadAll();
     //Form Validate
+    $('#frmProducto').validate({
+        lang: 'es', 
+        rules: {
+            'id': "required",
+            'nombre': "required"
+        },
+        submitHandler: function() {
+            $('#btnProducto').attr("disabled", "disabled");
+            Save();   
+        }
+    }); 
+    // eventos
+    $('#cantidad').change(function() {
+        producto.cantidad= $('#cantidad').val();
+        producto.precio= $('#precio').val();
+        //
+        $('#calc').val(producto.Calc);
+    });
 });
 
 // Carga lista
@@ -81,28 +93,30 @@ function showData(e) {
     $.each(data, function (i, item) {
         var row =
             '<tr>' +
-            '<td>' + item.id + '</td>' +
-            '<td>' + item.Nombre + '</td>' +
-            '<td>' + item.scancode + '</td>' +
-            '<td>' + item.Cantidad + '</td>' +
-            // '<td><img id=btnmodingreso'+ item.id + ' class=borrar src=img/file_mod.png></td>'+
-            // '<td><img id=btnborraingreso'+ item.id + ' class=borrar src=img/file_delete.png></td>'+
+                '<td>' + item.id + '</td>' +
+                '<td>' + item.nombre + '</td>' +
+                '<td>' + item.scancode + '</td>' +
+                '<td>' + item.cantidad + '</td>' +
+                '<td>' + item.precio + '</td>' +
+                '<td>' + item.codigorapido + '</td>' +
+                '<td><img id=btnmodingreso'+ item.id + ' class=borrar src=img/file_mod.png></td>'+
+                '<td><img id=btnborraingreso'+ item.id + ' class=borrar src=img/file_delete.png></td>'+
             '</tr>';
         $('#tableBody-Producto').append(row);
         // evento click del boton modificar-eliminar
-        //$('#btnmodingreso' + item.id).click(UpdateEventHandler);
-        //$('#btnborraingreso' + item.id).click(DeleteEventHandler);
+        $('#btnmodingreso' + item.id).click(UpdateEventHandler);
+        $('#btnborraingreso' + item.id).click(DeleteEventHandler);
     })
 };
 
 function UpdateEventHandler() {
-    id = $(this).parents("tr").find("td").eq(0).text();  //Columna 0 de la fila seleccionda= ID.
+    producto.id = $(this).parents("tr").find("td").eq(0).text();  //Columna 0 de la fila seleccionda= ID.
     $.ajax({
         type: "POST",
         url: "class/Producto.php",
         data: {
             action: 'Load',
-            id: id
+            producto: JSON.stringify(producto)
         }
     })
     .done(function (e) {
@@ -114,7 +128,7 @@ function UpdateEventHandler() {
 };
 
 function DeleteEventHandler() {
-    id = $(this).parents("tr").find("td").eq(0).text(); //Columna 0 de la fila seleccionda= ID.
+    producto.id = $(this).parents("tr").find("td").eq(0).text(); //Columna 0 de la fila seleccionda= ID.
     // Mensaje de borrado:
     swal({
         title: 'Eliminar?',
@@ -139,10 +153,10 @@ function Delete() {
         url: "class/Producto.php",
         data: { 
             action: 'Delete',                
-            id:  id
+            producto:  JSON.stringify(producto)
         }            
     })
-    .done(function( e ) {        
+    .done(function( e ) {
         var data = JSON.parse(e);   
         if(data.status==1)
         {
@@ -157,55 +171,48 @@ function Delete() {
             'El registro se ha eliminado.',
             'success'
         );
-        LoadAll();
     })    
     .fail(function (e) {
         showError(e);
-    });
+    })
+    .always(LoadAll);
 };
 
 function CleanCtls() {
-    // $("#inp-Nombre-Producto").val('');
-    // $("#inp-PrecioFinal-Producto").val('');    
-    // $("#inp-Cantidad-Producto").val('');
-    // $("#inp-Codigo-Producto").val('');
-    // $("#inp-var5-Producto").val('');
+    $("#id").val('');
+    $("#nombre").val('');    
+    $("#cantidad").val('');
+    $("#precio").val('');
+    $("#codigorapido").val('');
 };
 
 function ShowItemData(e) {
     // Limpia el controles
-    CleanCtls();
+    CleanCtls();    
     // carga objeto.
-    var data = JSON.parse(e);
-    $("#id").val(data[0].id);
-    $("#nombre").val(data[0].Nombre);
+    var data = JSON.parse(e)[0];
+    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido);
+    // Asigna objeto a controles
+    $("#id").val(producto.id);
+    $("#nombre").val(producto.nombre);
+    $("#precio").val(producto.precio);
+    $("#cantidad").val(producto.cantidad);
+    $("#codigorapido").val(producto.codigorapido);
 };
 
-function FormValidate(){
-    $("#frmProducto").validate({
-        lang: 'es', 
-        rules: {
-            'id': "required",
-            'nombre': "required"
-        },
-        submitHandler: function() {
-            $('#btnProducto').attr("disabled", "disabled");
-            Save();   
-        }
-    });  
-};
-
-// Save
 function Save(){   
     // Ajax: insert / Update.
-    var miAccion= id==null ? 'Insert' : 'Update';
+    var miAccion= producto.id==null ? 'Insert' : 'Update';
+    producto.nombre = $("#nombre").val();
+    producto.cantidad = $("#cantidad").val();
+    producto.precio = $("#precio").val();
+    producto.codigorapido = $("#codigorapido").val();
     $.ajax({
         type: "POST",
         url: "class/Producto.php",
         data: { 
             action: miAccion,  
-            id: id,              
-            Nombre: $("#nombre").val()
+            producto: JSON.stringify(producto)
         }
     })
     .done(showInfo)

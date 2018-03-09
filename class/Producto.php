@@ -1,11 +1,6 @@
 <?php
 if (!isset($_SESSION))
     session_start();
-require_once('Globals.php');
-require_once("Conexion.php");
-require_once("Log.php");
-
-//Globals::ConfiguracionIni();
 
 if(isset($_POST["action"])){
     $producto= new Producto();
@@ -14,52 +9,49 @@ if(isset($_POST["action"])){
             echo json_encode($producto->LoadAll());
             break;
         case "Load":
-            $producto->id=$_POST["id"];
             echo json_encode($producto->Load());
             break;
         case "Insert":
-            $producto->Nombre= $_POST["Nombre"];
-            // $producto->Cantidad= $_POST["Cantidad"];
-            // $producto->Scancode= $_POST["Scancode"];
-            // $producto->Precio= $_POST["Precio"];
-            // $producto->CodigoRapido= $_POST["CodigoRapido"];
             $producto->Insert();
             break;
         case "Update":
-            $producto->id= $_POST["id"];
-            $producto->Nombre= $_POST["Nombre"];
-            // $producto->Cantidad= $_POST["Cantidad"];            
-            // $producto->Scancode= $_POST["Scancode"];
-            // $producto->Precio= $_POST["Precio"];
-            // $producto->CodigoRapido= $_POST["CodigoRapido"];
             $producto->Update();
             break;
-        case "Delete":
-            $producto->id= $_POST["id"];            
-            $producto->Delete();
+        case "Delete":      
+            echo json_encode($producto->Delete());
             break;   
     }
 }
 
 class Producto{
-    public $id='';
-    public $Nombre='';
-    public $Cantidad='';
-    public $Scancode='';
-    public $Precio='';
-    public $CodigoRapido='';
+    public $id=null;
+    public $nombre='';
+    public $cantidad=0;
+    public $scancode='';
+    public $precio=0;
+    public $codigorapido='';
 
     function __construct(){
-        require_once('Globals.php');
         require_once("Conexion.php");
-        require_once("Log.php");
+        //require_once("Log.php");
+        //require_once('Globals.php');
+        //
+        if(isset($_POST["producto"])){
+            $obj= json_decode($_POST["producto"],true);
+            $this->id= $obj["id"] ?? null;
+            $this->nombre= $obj["nombre"] ?? '';
+            $this->cantidad= $obj["cantidad"] ?? 0;            
+            $this->scancode= $obj["scancode"] ?? '';
+            $this->precio= $obj["precio"] ?? 0;
+            $this->codigorapido= $obj["codigorapido"] ?? 0;
+        }
     }
 
     function LoadAll(){
         try {
-            $sql='SELECT id, Nombre, Cantidad, Scancode, Precio , CodigoRapido 
+            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido 
                 FROM     producto       
-                ORDER BY Nombre asc';
+                ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
             return $data;
         }     
@@ -74,7 +66,7 @@ class Producto{
 
     function Load(){
         try {
-            $sql='SELECT id, Nombre, Cantidad, Scancode, Precio , CodigoRapido 
+            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido 
                 FROM producto  
                 where id=:id';
             $param= array(':id'=>$this->id);
@@ -92,10 +84,10 @@ class Producto{
 
     function Insert(){
         try {
-            $sql="INSERT INTO producto   (id,Nombre, Cantidad, Scancode, Precio ,CodigoRapido)
-                VALUES (uuid(),:Nombre, :Cantidad, :Scancode, :Precio ,:CodigoRapido)";              
+            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido)
+                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido)";              
             //
-            $param= array(':Nombre'=>$this->Nombre,':Cantidad'=>$this->Cantidad,':Scancode'=>$this->Scancode, ':Precio'=>$this->Precio, ':CodigoRapido'=>$this->CodigoRapido);
+            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido);
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
@@ -115,10 +107,10 @@ class Producto{
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET Nombre=:Nombre, Cantidad=:Cantidad, Scancode=:Scancode, Precio=:Precio CodigoRapido=:CodigoRapido
+                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':Nombre'=>$this->Nombre,':Cantidad'=>$this->Cantidad,':Scancode'=>$this->Scancode, 'Precio'=>$this->Precio , 'CodigoRapido'=>$this->CodigoRapido );
-            $data = DATA::Ejecutar($sql,$param,true);
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, 'precio'=>$this->precio , 'codigorapido'=>$this->codigorapido );
+            $data = DATA::Ejecutar($sql,$param,false);
             if($data)
                 return true;
             else throw new Exception('Error al guardar.', 123);
@@ -155,16 +147,18 @@ class Producto{
     function Delete(){
         try {
             // if($this->CheckRelatedItems()){
-            //     echo "Registro en uso";
-            //     return false;
-            // }                
+            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+            //     $sessiondata['status']=1; 
+            //     $sessiondata['msg']='Registro en uso'; 
+            //     return $sessiondata;           
+            // }                    
             $sql='DELETE FROM producto  
             WHERE id= :id';
             $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql, $param, true);
+            $data= DATA::Ejecutar($sql, $param, false);
             if($data)
-                return true;
-            else throw new Exception('Error al guardar.', 123);
+                return $sessiondata['status']=0; 
+            else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {            
             header('HTTP/1.0 400 Bad error');

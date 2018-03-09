@@ -17,13 +17,19 @@
 </head>
 <body>
     <table id='tbl'>
-        <thead> <tr> <th>ID</th> <th>NOMBRE</th> <th>SCANCODE</th> <th>CANTIDAD</th> </tr> </thead> <tbody id='tableBody-Producto'></tbody>
+        <thead> <tr> <th>ID</th> <th>NOMBRE</th> <th>SCANCODE</th> <th>CANTIDAD</th> <th>PRECIO</th> <th>CODIGO</th> <th>ACcIONES</th> </tr> </thead> <tbody id='tableBody-Producto'></tbody>
     </table>
     
     <form id="frmProducto" name="frmProducto" >
         <input type="text" id="id" name="id" placeholder="UUID" required>
-        <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+        <input type="text" id="nombre" name="nombre" placeholder="nombre" required>
+        <input type="text" id="cantidad" name="cantidad" placeholder="Cantidad">
+        <input type="text" id="precio" name="precio" placeholder="Precio" >
+        <input type="text" id="codigorapido" name="codigorapido" placeholder="Codigo Rapido" >
+        <input type="text" id="calc" name="calc" placeholder="***CALC***" >
         <button type="submit" value="submit" id="btnProducto" >SUBMIT</button>
     </form>
+
 </body>
+
 </html>

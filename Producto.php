@@ -26,8 +26,10 @@
         <input type="text" id="cantidad" name="cantidad" placeholder="Cantidad">
         <input type="text" id="precio" name="precio" placeholder="Precio" >
         <input type="text" id="codigorapido" name="codigorapido" placeholder="Codigo Rapido" >
-        <select id="categoria">  
+        <select id="categoria" >  
+            <option disabled="disabled" selected="selected" value="optdef">Categorías</option>
         </select>
+        <input id="fecha" name="fecha" type="date" />
         <input type="text" id="calc" name="calc" placeholder="***CALC***" >
         <button type="submit" value="submit" id="btnProducto" >SUBMIT</button>
     </form>

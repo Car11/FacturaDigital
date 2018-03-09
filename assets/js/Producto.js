@@ -1,6 +1,6 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria) {
+    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fecha) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.scancode=scancode || '';
@@ -8,6 +8,7 @@ class Producto {
         this.precio=precio || 0;
         this.codigorapido= codigorapido || '';
         this.idcategoria= idcategoria || null;
+        this.fecha= fecha || null;
     }
 
     //Get
@@ -219,6 +220,8 @@ function CleanCtls() {
     $("#cantidad").val('');
     $("#precio").val('');
     $("#codigorapido").val('');
+    $("#fecha").val('');
+    $("#categoria").val('optdef');
 };
 
 function ShowItemData(e) {
@@ -226,7 +229,7 @@ function ShowItemData(e) {
     CleanCtls();    
     // carga objeto.
     var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria);
+    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fecha);
     // Asigna objeto a controles
     $("#id").val(producto.id);
     $("#nombre").val(producto.nombre);
@@ -234,6 +237,7 @@ function ShowItemData(e) {
     $("#cantidad").val(producto.cantidad);
     $("#codigorapido").val(producto.codigorapido);
     $("#categoria").val(producto.idcategoria);
+    $("#fecha").val(producto.fecha);
 };
 
 function Save(){   
@@ -244,6 +248,8 @@ function Save(){
     producto.precio = $("#precio").val();
     producto.codigorapido = $("#codigorapido").val();
     producto.idcategoria= $("#categoria").val();
+    producto.fecha= $("#fecha").val();
+    //
     $.ajax({
         type: "POST",
         url: "class/Producto.php",

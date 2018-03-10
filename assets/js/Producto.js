@@ -1,6 +1,6 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fecha) {
+    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fechaExpiracion) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.scancode=scancode || '';
@@ -8,7 +8,7 @@ class Producto {
         this.precio=precio || 0;
         this.codigorapido= codigorapido || '';
         this.idcategoria= idcategoria || null;
-        this.fecha= fecha || null;
+        this.fechaExpiracion= fechaExpiracion || null;
     }
 
     //Get
@@ -24,7 +24,7 @@ $(document).ready(function () {
     LoadAll();
     LoadCategories();
     //Form Validate
-    $('#frmProducto').validate({
+    /*$('#frmProducto').validate({
         lang: 'es', 
         rules: {            
             'nombre': "required",
@@ -36,7 +36,7 @@ $(document).ready(function () {
             $('#btnProducto').attr("disabled", "disabled");
             Save();   
         }
-    }); 
+    });*/ 
     // eventos
     $('#cantidad').change(function() {
         producto.cantidad= $('#cantidad').val();
@@ -220,7 +220,7 @@ function CleanCtls() {
     $("#cantidad").val('');
     $("#precio").val('');
     $("#codigorapido").val('');
-    $("#fecha").val('');
+    $("#fechaExpiracion").val('');
     $("#categoria").val('optdef');
 };
 
@@ -229,7 +229,7 @@ function ShowItemData(e) {
     CleanCtls();    
     // carga objeto.
     var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fecha);
+    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
     // Asigna objeto a controles
     $("#id").val(producto.id);
     $("#nombre").val(producto.nombre);
@@ -237,7 +237,7 @@ function ShowItemData(e) {
     $("#cantidad").val(producto.cantidad);
     $("#codigorapido").val(producto.codigorapido);
     $("#categoria").val(producto.idcategoria);
-    $("#fecha").val(producto.fecha);
+    $("#fechaExpiracion").val(producto.fechaExpiracion);
 };
 
 function Save(){   
@@ -248,7 +248,7 @@ function Save(){
     producto.precio = $("#precio").val();
     producto.codigorapido = $("#codigorapido").val();
     producto.idcategoria= $("#categoria").val();
-    producto.fecha= $("#fecha").val();
+    producto.fechaExpiracion= $("#fechaExpiracion").val();
     //
     $.ajax({
         type: "POST",

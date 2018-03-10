@@ -16,22 +16,23 @@
     <script src="assets/js/Producto.js"></script>
 </head>
 <body>
-    <table id='tbl'>
-        <thead> <tr> <th>ID</th> <th>NOMBRE</th> <th>SCANCODE</th> <th>CANTIDAD</th> <th>PRECIO</th> <th>CODIGO</th> <th>ACcIONES</th> </tr> </thead> <tbody id='tableBody-Producto'></tbody>
+    <table >
+        
     </table>
     
-    <form id="frmProducto" name="frmProducto" >
-        <input type="text" id="id" name="id" placeholder="UUID" required>
-        <input type="text" id="nombre" name="nombre" placeholder="nombre" required>
-        <input type="text" id="cantidad" name="cantidad" placeholder="Cantidad">
-        <input type="text" id="precio" name="precio" placeholder="Precio" >
-        <input type="text" id="codigorapido" name="codigorapido" placeholder="Codigo Rapido" >
-        <select id="categoria" >  
-            <option disabled="disabled" selected="selected" value="optdef">Categorías</option>
+    <form >
+        <input type="text"  required>
+        <input type="text" >
+        <input type="text" >
+        <input type="text" >
+        <input type="text"  >
+        <input type="text"  >
+        <select >  
+            
         </select>
-        <input id="fecha" name="fecha" type="date" />
-        <input type="text" id="calc" name="calc" placeholder="***CALC***" >
-        <button type="submit" value="submit" id="btnProducto" >SUBMIT</button>
+        <input  type="date" />
+        <input type="text" id="calc" name="calc" placeholder="Campo Calculado | Ejemplo" >
+        <button type="submit" value="submit" >SUBMIT</button>
     </form>
 
 </body>

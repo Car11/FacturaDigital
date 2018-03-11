@@ -21,22 +21,15 @@ let producto = new Producto();
 
 $(document).ready(function () {
     // Load list
-    LoadAll();
-    LoadCategories();
+    //LoadAll();
+    //LoadCategories();
     //Form Validate
-    /*$('#frmProducto').validate({
-        lang: 'es', 
-        rules: {            
-            'nombre': "required",
-            'cantidad': {
-                minlength:1,maxlength:5
-            }
-        },
+    /*$('#frmProducto').Validate({
         submitHandler: function() {
-            $('#btnProducto').attr("disabled", "disabled");
+            //$('#btnProducto').attr("disabled", "disabled");
             Save();   
         }
-    });*/ 
+    });*/
     // eventos
     $('#cantidad').change(function() {
         producto.cantidad= $('#cantidad').val();
@@ -252,7 +245,7 @@ function Save(){
     //
     $.ajax({
         type: "POST",
-        url: "class/Producto.php",
+        url: "../../../class/Producto.php",
         data: { 
             action: miAccion,  
             producto: JSON.stringify(producto)

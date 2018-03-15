@@ -32,6 +32,7 @@ class Producto{
     public $codigorapido='';
     public $idcategoria='';
     public $fechaExpiracion=null;
+    public $descripcion='';
 
     function __construct(){
         require_once("Conexion.php");
@@ -42,6 +43,7 @@ class Producto{
             $obj= json_decode($_POST["producto"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
+            $this->nombre= $obj["descripcion"] ?? '';
             $this->cantidad= $obj["cantidad"] ?? 0;            
             $this->scancode= $obj["scancode"] ?? '';
             $this->precio= $obj["precio"] ?? 0;
@@ -70,7 +72,7 @@ class Producto{
 
     function Load(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion
+            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion, descripcion
                 FROM producto  
                 where id=:id';
             $param= array(':id'=>$this->id);
@@ -88,10 +90,10 @@ class Producto{
 
     function Insert(){
         try {
-            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion)
-                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion)";              
+            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion, descripcion)
+                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion, :descripcion)";              
             //
-            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion );
+            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
@@ -111,9 +113,9 @@ class Producto{
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion
+                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion descripcion= :descripcion
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion );
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
                 return true;

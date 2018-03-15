@@ -1,8 +1,9 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fechaExpiracion) {
+    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fechaExpiracion, descripcion) {
         this.id = id || null;
         this.nombre = nombre || '';
+        this.descripcion = this.descripcion || '';
         this.scancode=scancode || '';
         this.cantidad=cantidad || 0;
         this.precio=precio || 0;
@@ -11,9 +12,9 @@ class Producto {
         this.fechaExpiracion= fechaExpiracion || null;
     }
 
-    //Get
+    //Get Ejemplo.
     get Calc() {
-    return this.cantidad * this.precio;
+        return this.cantidad * this.precio;
     }
 }
 
@@ -22,7 +23,11 @@ let producto = new Producto();
 $(document).ready(function () {
     // Load list
     //LoadAll();
-    //LoadCategories();
+    LoadCategories();
+    $('#btnProducto').click(function(){
+        //$('#btnProducto').attr("disabled", "disabled");
+        Save();  
+    });
     //Form Validate
     /*$('#frmProducto').Validate({
         submitHandler: function() {
@@ -30,8 +35,8 @@ $(document).ready(function () {
             Save();   
         }
     });*/
-    // eventos
-    $('#cantidad').change(function() {
+    // eventos Ejemplo.
+    $('#cantidad').change(function(){
         producto.cantidad= $('#cantidad').val();
         producto.precio= $('#precio').val();
         //
@@ -44,7 +49,7 @@ function LoadAll() {
     id=null;
     $.ajax({
         type: "POST",
-        url: "../../class/Producto.php",
+        url: "class/Producto.php",
         data: {
             action: "LoadAll"
         }
@@ -133,8 +138,6 @@ function showDataCategoria(e) {
         var opt =
             '<option value="'+ item.id + '">'+ item.nombre + '</option>';
         $('#categoria').append(opt);
-        // evento click del boton modificar-eliminar
-        //$('#option' + item.id).click(event-handler);
     })
 };
 
@@ -226,6 +229,7 @@ function ShowItemData(e) {
     // Asigna objeto a controles
     $("#id").val(producto.id);
     $("#nombre").val(producto.nombre);
+    $("#descripcion").val(producto.descripcion);
     $("#precio").val(producto.precio);
     $("#cantidad").val(producto.cantidad);
     $("#codigorapido").val(producto.codigorapido);
@@ -237,6 +241,7 @@ function Save(){
     // Ajax: insert / Update.
     var miAccion= producto.id==null ? 'Insert' : 'Update';
     producto.nombre = $("#nombre").val();
+    producto.descripcion = $("#descripcion").val();
     producto.cantidad = $("#cantidad").val();
     producto.precio = $("#precio").val();
     producto.codigorapido = $("#codigorapido").val();
@@ -245,7 +250,7 @@ function Save(){
     //
     $.ajax({
         type: "POST",
-        url: "../../../class/Producto.php",
+        url: "class/Producto.php",
         data: { 
             action: miAccion,  
             producto: JSON.stringify(producto)

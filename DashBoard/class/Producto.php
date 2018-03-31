@@ -5,20 +5,20 @@ if (!isset($_SESSION))
 if(isset($_POST["action"])){
     $producto= new Producto();
     switch($_POST["action"]){
-        case "LoadAll":
-            echo json_encode($producto->LoadAll());
+        case "ReadAll":
+            echo json_encode($producto->ReadAll());
             break;
-        case "Load":
-            echo json_encode($producto->Load());
+        case "Read":
+            echo json_encode($producto->Read());
             break;
         case "Insert":
-            $producto->Insert();
+            $producto->Create();
             break;
         case "Update":
             $producto->Update();
             break;
         case "Delete":
-            echo json_encode($producto->Delete());
+            $producto->Delete();
             break;   
     }
 }
@@ -39,8 +39,12 @@ class Producto{
         //require_once("Log.php");
         //require_once('Globals.php');
         //
-        if(isset($_POST["producto"])){
-            $obj= json_decode($_POST["producto"],true);
+        // identificador único
+        if(isset($_POST["id"])){
+            $this->id= $_POST["id"];
+        }
+        if(isset($_POST["obj"])){
+            $obj= json_decode($_POST["obj"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
             $this->nombre= $obj["descripcion"] ?? '';
@@ -53,9 +57,9 @@ class Producto{
         }
     }
 
-    function LoadAll(){
+    function ReadAll(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido
+            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigorapido
                 FROM     producto       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
@@ -70,7 +74,7 @@ class Producto{
         }
     }
 
-    function Load(){
+    function Read(){
         try {
             $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion, descripcion
                 FROM producto  
@@ -88,7 +92,7 @@ class Producto{
         }
     }
 
-    function Insert(){
+    function Create(){
         try {
             $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion, descripcion)
                 VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion, :descripcion)";              

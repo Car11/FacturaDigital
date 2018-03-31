@@ -229,7 +229,7 @@ function ShowItemData(e) {
     CleanCtls();    
     // carga objeto.
     var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
+     
     // Asigna objeto a controles
     $("#id").val(producto.id);
     $("#nombre").val(producto.nombre);

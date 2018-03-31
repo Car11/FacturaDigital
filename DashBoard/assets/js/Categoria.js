@@ -1,15 +1,9 @@
-class Producto {
+class Categoria {
     // Constructor
-    constructor(id, nombre, scancode, cantidad, precio, codigorapido, idcategoria, fechaExpiracion, descripcion) {
+    constructor(id, nombre, descripcion) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.descripcion = this.descripcion || '';
-        this.scancode=scancode || '';
-        this.cantidad=cantidad || 0;
-        this.precio=precio || 0;
-        this.codigorapido= codigorapido || '';
-        this.idcategoria= idcategoria || null;
-        this.fechaExpiracion= fechaExpiracion || null;
     }
 
     //Getter
@@ -17,7 +11,7 @@ class Producto {
         var miAccion= this.id==null ? 'ReadAll' : 'Read';
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Categoria.php",
             data: { 
                 action: miAccion,
                 id: this.id
@@ -32,18 +26,13 @@ class Producto {
     }
 
     get Save(){
-        $('#btnProducto').attr("disabled", "disabled");
-        var miAccion= producto.id==null ? 'Create' : 'Update';
+        $('#btnCategoria').attr("disabled", "disabled");
+        var miAccion= Categoria.id==null ? 'Create' : 'Update';
         this.nombre = $("#nombre").val();
         this.descripcion = $("#descripcion").val();
-        this.cantidad = $("#cantidad").val();
-        this.precio = $("#precio").val();
-        this.codigorapido = $("#codigorapido").val();
-        this.idcategoria= $("#categoria").val();
-        this.fechaExpiracion= $("#fechaExpiracion").val();
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Categoria.php",
             data: { 
                 action: miAccion,  
                 obj: JSON.stringify(this)
@@ -54,8 +43,8 @@ class Producto {
             showError(e);
         })
         .always(function() {
-            setTimeout('$("#btnProducto").removeAttr("disabled")', 1000);
-            producto= new Producto();
+            setTimeout('$("#btnCategoria").removeAttr("disabled")', 1000);
+            Categoria= new Categoria();
             ClearCtls();
             Reload();   
         });
@@ -64,7 +53,7 @@ class Producto {
     get Delete() {
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Categoria.php",
             data: { 
                 action: 'Delete',                
                 id: this.id
@@ -83,34 +72,33 @@ class Producto {
             showError(e);
         })
         .always(function(){
-            comment= new Producto();
+            comment= new Categoria();
             Reload();
         });
     }
 }
 
+
 //Class Instance
-let producto = new Producto();
+let categoria = new Categoria();
 
 function Init() {
     // Read list
-    producto.Read;
-    // Clase categorias
-    //LoadCategories();
-    $('#btnProducto').click(function(){
-        producto.Save;
+    categoria.Read;
+    $('#btnCategoria').click(function(){
+        categoria.Save;
     });
     //Form Validate
-    // $('#frmProducto').Validate({
+    // $('#frmcategoria').Validate({
     //     submitHandler: function() {
-    //         producto.Save;   
+    //         categoria.Save;   
     //     }
     // });
 };
 
 // Methods
 function Reload(e){
-    if(producto.id==null)
+    if(categoria.id==null)
         ShowAll(e);
     else ShowItemData(e);
 };
@@ -143,29 +131,22 @@ function ClearCtls() {
     $("#id").val('');
     $("#nombre").val('');    
     $("#descripcion").val('');
-    $("#cantidad").val('');
-    $("#precio").val('');
-    $("#codigorapido").val('');
-    $("#fechaExpiracion").val('');
-    $("#categoria").val('optdef');
 };
 
 function ShowAll(e) {
     // Limpia el div que contiene la tabla.
-    $('#tableBody-Producto').html("");
+    $('#tableBody-categoria').html("");
     // Carga lista
     var data = JSON.parse(e);
     $.each(data, function (i, item) {
-        $('#tableBody-Producto').append(`
+        $('#tableBody-categoria').append(`
             <tr> 
                 <td class="a-center ">
                     <input type="checkbox" class="flat" name="table_records">
                 </td>
                 <td class="itemId" style="display: none" >${item.id}</td>
                 <td>${item.nombre}</td>
-                <td>${item.codigorapido}</td>
-                <td>${item.cantidad}</td>
-                <td>${item.precio}</td>
+                <td>${item.descripcion}</td>
                 <td class=" last"> 
                     <a id="update${item.id}" > <i class="glyphicon glyphicon-edit"> </i> Editar </a> 
                     <a id="delete${item.id}" > <i class="glyphicon glyphicon-trash"> </i> Eliminar </a> 
@@ -178,9 +159,20 @@ function ShowAll(e) {
     })
 };
 
+function ShowList(e) {
+    // carga lista con datos.
+    var data = JSON.parse(e);
+    // Recorre arreglo.
+    $.each(data, function (i, item) {
+        $('#categoria').append(`
+            <option value="${item.id}">${item.nombre}</option>
+        `);
+    })
+};
+
 function UpdateEventHandler() {
-    producto.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
-    producto.Read;
+    categoria.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+    categoria.Read;
 };
 
 function ShowItemData(e) {
@@ -188,20 +180,15 @@ function ShowItemData(e) {
     ClearCtls();    
     // carga objeto.
     var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
+    categoria = new categoria(data.id, data.nombre, data.descripcion);
     // Asigna objeto a controles
-    $("#id").val(producto.id);
-    $("#nombre").val(producto.nombre);
-    $("#descripcion").val(producto.descripcion);
-    $("#precio").val(producto.precio);
-    $("#cantidad").val(producto.cantidad);
-    $("#codigorapido").val(producto.codigorapido);
-    $("#categoria").val(producto.idcategoria);
-    $("#fechaExpiracion").val(producto.fechaExpiracion);
+    $("#id").val(categoria.id);
+    $("#nombre").val(categoria.nombre);
+    $("#descripcion").val(categoria.descripcion);
 };
 
 function DeleteEventHandler() {
-    producto.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+    categoria.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
     // Mensaje de borrado:
     swal({
         title: 'Eliminar?',

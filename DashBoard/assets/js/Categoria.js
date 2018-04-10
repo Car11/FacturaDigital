@@ -78,7 +78,6 @@ class Categoria {
     }
 }
 
-
 //Class Instance
 let categoria = new Categoria();
 

@@ -1,8 +1,8 @@
 $(document).ready(function () {
     producto.id=null;
     producto.Read;
-    // Load list
-    //LoadAll();
+    producto.Init();
+
     //LoadCategories();
     //Form Validate
     /*$('#frmProducto').validate({

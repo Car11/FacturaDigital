@@ -24,10 +24,10 @@ class Producto {
             }
         })
         .done(function( e ) {
-            Reload(e);
+            producto.Reload(e);
         })    
         .fail(function (e) {
-            showError(e);
+            producto.showError(e);
         });
     }
 
@@ -56,8 +56,8 @@ class Producto {
         .always(function() {
             setTimeout('$("#btnProducto").removeAttr("disabled")', 1000);
             producto= new Producto();
-            ClearCtls();
-            Reload();   
+            producto.ClearCtls();
+            producto.Read;   
         });
     }
 
@@ -80,37 +80,37 @@ class Producto {
             });
         })    
         .fail(function (e) {
-            showError(e);
+            producto.showError(e);
         })
         .always(function(){
-            comment= new Producto();
-            Reload();
+            producto= new Producto();
+            producto.Reload();
         });
     }
 
     // Methods
     Reload(e){
-        if(producto.id==null)
-            ShowAll(e);
-        else ShowItemData(e);
+        if(this.id==null)
+            this.ShowAll(e);
+        else this.ShowItemData(e);
     };
 
     // Muestra información en ventana
     showInfo() {
         //$(".modal").css({ display: "none" });  
-        // swal({
-        //     position: 'top-end',
-        //     type: 'success',
-        //     title: 'Good!',
-        //     showConfirmButton: false,
-        //     timer: 1000
-        // });
-        new PNotify({
-                title: 'Hecho',
-                text: 'xxx xxx xxx!',
-                type: 'success',
-                styling: 'bootstrap3'
-            });
+        swal({
+            position: 'top-end',
+            type: 'success',
+            title: 'Good!',
+            showConfirmButton: false,
+            timer: 1000
+        });
+        // new PNotify({
+        //         title: 'Hecho',
+        //         text: 'xxx xxx xxx!',
+        //         type: 'success',
+        //         styling: 'bootstrap3'
+        //     });
     };
 
     // Muestra errores en ventana
@@ -142,7 +142,7 @@ class Producto {
         // Carga lista
         var data = JSON.parse(e);
         $.each(data, function (i, item) {
-            $('#tableBody-Producto').append(`
+            $('#tableBody-Producto').append(`            
                 <tr> 
                     <td class="a-center ">
                         <input type="checkbox" class="flat" name="table_records">
@@ -152,15 +152,15 @@ class Producto {
                     <td>${item.codigorapido}</td>
                     <td>${item.cantidad}</td>
                     <td>${item.precio}</td>
-                    <td class=" last"> 
-                        <a id="update${item.id}" > <i class="glyphicon glyphicon-edit"> </i> Editar </a> 
-                        <a id="delete${item.id}" > <i class="glyphicon glyphicon-trash"> </i> Eliminar </a> 
+                    <td class=" last">                     
+                        <a href="#" id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar   </a>                         
+                        <a href="#" id="delete${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-trash"> </i> Eliminar </a> 
                     </td>
                 </tr>
             `);
             // event Handler
-            $('#update' + item.id).click(UpdateEventHandler);
-            $('#delete' + item.id).click(DeleteEventHandler);
+            $('#update' + item.id).click(producto.UpdateEventHandler);
+            $('#delete' + item.id).click(producto.DeleteEventHandler);
         })
     };
 
@@ -171,7 +171,7 @@ class Producto {
     
     ShowItemData(e) {
         // Limpia el controles
-        ClearCtls();    
+        this.ClearCtls();    
         // carga objeto.
         var data = JSON.parse(e)[0];
         producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
@@ -202,8 +202,39 @@ class Producto {
             cancelButtonClass: 'btn btn-danger'
         }).then((result) => {
             if (result.value) {
-                categoria.Delete;
+                producto.Delete;
             }
+        })
+    };
+
+    Init() {    
+        // $('#btnProducto').click(function(){
+        //     producto.Save;
+        // });
+           
+        //Form Validate
+        // $('#frmProducto').Validate({
+        //     submitHandler: function() {
+        //         producto.Save;   
+        //     }
+        // });
+
+        $('#frmProducto').submit(function(e){
+            e.preventDefault();
+            var submit = true;
+            // you can put your own custom validations below
+    
+            // check all the rerquired fields
+            if( !validator.checkAll( $(this) ) )
+                submit = false;
+    
+            if( submit ){
+                this.submit();
+                producto.Save;
+            }
+                
+    
+            return false;
         })
     };
 }
@@ -211,21 +242,7 @@ class Producto {
 //Class Instance
 let producto = new Producto();
 
-function Init() {
-    // Read list
-    //producto.Read;
-    // Clase categorias
-    //LoadCategories();
-    $('#btnProducto').click(function(){
-        producto.Save;
-    });
-    //Form Validate
-    // $('#frmProducto').Validate({
-    //     submitHandler: function() {
-    //         producto.Save;   
-    //     }
-    // });
-};
+
 
 
 

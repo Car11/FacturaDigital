@@ -11,7 +11,7 @@ if(isset($_POST["action"])){
         case "Read":
             echo json_encode($producto->Read());
             break;
-        case "Insert":
+        case "Create":
             $producto->Create();
             break;
         case "Update":
@@ -47,7 +47,7 @@ class Producto{
             $obj= json_decode($_POST["obj"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
-            $this->nombre= $obj["descripcion"] ?? '';
+            $this->descripcion= $obj["descripcion"] ?? '';
             $this->cantidad= $obj["cantidad"] ?? 0;            
             $this->scancode= $obj["scancode"] ?? '';
             $this->precio= $obj["precio"] ?? 0;
@@ -117,7 +117,7 @@ class Producto{
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion descripcion= :descripcion
+                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion, descripcion= :descripcion
                 WHERE id=:id";
             $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);

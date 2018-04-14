@@ -65,7 +65,7 @@ class Producto{
             $data= DATA::Ejecutar($sql);
             return $data;
         }     
-        catch(Exception $e) {   
+        catch(Exception $e) {
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,

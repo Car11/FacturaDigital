@@ -219,23 +219,23 @@ class Producto {
         //     }
         // });
 
-        $('#frmProducto').submit(function(e){
-            e.preventDefault();
-            var submit = true;
-            // you can put your own custom validations below
+        // $('#frmProducto').submit(function(e){
+        //     e.preventDefault();
+        //     var submit = true;
+        //     // you can put your own custom validations below
     
-            // check all the rerquired fields
-            if( !validator.checkAll( $(this) ) )
-                submit = false;
+        //     // check all the rerquired fields
+        //     if( !validator.checkAll( $(this) ) )
+        //         submit = false;
     
-            if( submit ){
-                this.submit();
-                producto.Save;
-            }
+        //     if( submit ){
+        //         //this.submit();
+        //         producto.Save;
+        //     }
                 
     
-            return false;
-        })
+        //     return false;
+        // })
     };
 }
 

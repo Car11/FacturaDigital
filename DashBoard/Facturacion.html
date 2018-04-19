@@ -56,10 +56,11 @@
                             <ul class="nav side-menu">
                                 <li><a><i class="fa fa-home"></i> home <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a href="Index.html">Index</a></li>
-                                        <li><a href="Producto.html">Nuevo Producto</a></li>
-                                        <li><a href="Categoria.html">Categorías</a></li>
-                                        <li><a href="Facturacion.html">Facturación</a></li>
+                                        <li><a href="index.html">Index</a></li>
+                                        <li><a href="inventario.html">Inventario</a></li>
+                                        <li><a href="producto.html">Nuevo Producto</a></li>
+                                        <li><a href="categoria.html">Categorías</a></li>
+                                        <li><a href="facturacion.html">Facturación</a></li>
                                     </ul>
                                 </li>
 
@@ -150,7 +151,7 @@
                                 </div>
                                 <!--  CONTENIDO DE LA PAGINA -->                                 
                                 <div class="x_content">
-                                    <div class="table-responsive table-fixed">
+                                    <div class="table-responsive">
                                         <table class="table table-striped jambo_table bulk_action">
                                             <thead>
                                                 <tr class="headings">
@@ -176,38 +177,40 @@
                                         </table>
                                     </div>
                                 </div>
+
+                                <!--  CONTENIDO DE SUBTOTALES -->                                 
                                 <div class="row">
-                                    <div class="col-10 col-sm-7 col-md-6 col-lg-4 col-xl-4 offset-1 offset-sm-4 offset-lg-8 offset-xl-8">
+                                    <div class="col-10 col-sm-7 col-md-6 col-lg-4 col-xl-4 offset-1 offset-sm-4 offset-lg-8 offset-xl-8 subtotales">
                                         <div class="x_content">
                                             <div class="table-responsive">
                                                 <table class="table table-striped jambo_table bulk_action">
                                                     <tbody>
                                                         <tr class="even pointer">
-                                                            <td class=" ">SubTotal</td>
-                                                            <td class=" ">  </td>
-                                                            <td class=" ">¢75.000</td>
+                                                            <td class="">SubTotal</td>
+                                                            <td class="">  </td>
+                                                            <td class="" id= "subtotal">¢0</td>
                                                         </tr>
                                                         <tr class="odd pointer">
-                                                            <td class=" ">Descuento</td>
-                                                            <td class=" ">5%</td>
-                                                            <td class=" ">¢1.200</td>
+                                                            <td class="">Descuento</td>
+                                                            <td class="" id="desc_100">0%</td>
+                                                            <td class="" id="desc_val">¢0</td>
                                                         </tr><tr class="even pointer">
-                                                                <td class=" ">Impuesto de Ventas</td>
-                                                                <td class="text-left">13% </td>
-                                                                <td class=" ">¢75.000</td>
+                                                                <td class="">Impuesto de Ventas</td>
+                                                                <td class="text-left" id="iv_100">13% </td>
+                                                                <td class="" id="iv_val">¢0</td>
                                                         </tr>
                                                         <tr class="odd pointer">
-                                                            <td class=" ">TOTAL</td>
-                                                            <td class=" "></td>
-                                                            <td class=" ">¢1.200</td>
+                                                            <td class="">TOTAL</td>
+                                                            <td class=""></td>
+                                                            <td class="" id="total">¢0</td>
                                                         </tr>
-                                                    </tbody>
-                                                </table>                                
+                                                    </tbody>                                                        
+                                                </table>
                                             </div>
-                                        </div>                        
+                                        </div>
                                     </div>
                                 </div>
-                                <!--  /CONTENIDO DE LA PAGINA -->
+                                <!--  CONTENIDO DE SUBTOTALES -->  
                             </div>
                         </div>
                     </div>
@@ -217,14 +220,8 @@
                     <div class="ln_solid"></div>
                     <div class="form-group">
                         <div class="col-md-6 col-md-offset-3">
-                            <button type="submit" class="btn btn-primary">Cancel</button>
-                            <button id="send" type="submit" class="btn btn-success" >Submit</button>
-                        </div>
-                    </div>
-                    
-                                </div>
-                                
-                            </div>
+                            <button type="submit" class="btn btn-primary">Limpiar</button>
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target=".factura-modal-lg">Cobrar</button>
                         </div>
                     </div>
                 </div>
@@ -242,6 +239,40 @@
         </div>
     </div>
 
+    <!-- modals -->
+    <!-- Large modal -->
+    <div class="modal fade factura-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content modal-factura">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Facturar</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div id="formapago">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-3" >
+                                <img id="fac-ccard" src="images/credit-cards.png" class="modal-img-pago">
+                                <p class="text-center">Tarjeta</p>
+                            </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-3">
+                                <img id="fac-cash" src="images/cash.png" class="modal-img-pago">
+                                <p class="text-center">Efectivo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Atras</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- modals -->
+    <!-- Large modal -->
 
     <!-- jQuery -->
     <script src="assets/js/jquery.min.js"></script>

@@ -207,35 +207,20 @@ class Producto {
         })
     };
 
-    Init() {    
-        // $('#btnProducto').click(function(){
-        //     producto.Save;
-        // });
-           
-        //Form Validate
-        // $('#frmProducto').Validate({
-        //     submitHandler: function() {
-        //         producto.Save;   
-        //     }
-        // });
+    Init() {
+        var validator = new FormValidator({ "events": ['blur', 'input', 'change'] }, document.forms[0]);
+        $('#frmProducto').submit(function(e){
+            e.preventDefault();
+            validatorResult = validator.checkAll(this);
+            if (validatorResult.valid)
+                producto.Save;    
+            return false;
+        });
 
-        // $('#frmProducto').submit(function(e){
-        //     e.preventDefault();
-        //     var submit = true;
-        //     // you can put your own custom validations below
-    
-        //     // check all the rerquired fields
-        //     if( !validator.checkAll( $(this) ) )
-        //         submit = false;
-    
-        //     if( submit ){
-        //         //this.submit();
-        //         producto.Save;
-        //     }
-                
-    
-        //     return false;
-        // })
+        // on form "reset" event
+        document.forms[0].onreset = function (e) {
+        validator.reset();
+        }
     };
 }
 

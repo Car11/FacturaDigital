@@ -162,25 +162,23 @@ class Producto {
             $('.update').click(producto.UpdateEventHandler);
             $('.delete').click(producto.DeleteEventHandler);
         })
-
-        // var dataTable =$("datatable").DataTable({ 
-        //     "order": [[ 2, "asc" ]]
-        // } ); 
-
-        var dataObject = {
-            columns: [{
-                title: "ID"
-            }, {
-                title: "COUNTY"
-            }]
-        };
-        var columns = [];
-
+        //datatable 
         $('#dsProducto').DataTable( {
             paging: true,
             search:true
         } );
+        // var dataTable =$("datatable").DataTable({ 
+        //     "order": [[ 2, "asc" ]]
+        // } ); 
 
+        // var dataObject = {
+        //     columns: [{
+        //         title: "ID"
+        //     }, {
+        //         title: "COUNTY"
+        //     }]
+        // };
+        // var columns = [];
         // $.fn.dataTableExt.afnFiltering.push(
         // function(oSettings, aData, iDataIndex) {
         //     var keywords = $(".dataTables_filter input").val().split(' ');  
@@ -265,7 +263,6 @@ class Producto {
         $('#dpfechaExpiracion').datetimepicker({
             format: 'DD/MM/YYYY'
         });
-
     };
 }
 

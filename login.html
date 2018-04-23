@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>FAC-CR | Login</title>
+
+  <!-- Bootstrap -->
+  <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="assets/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!-- NProgress -->
+  <link href="assets/css/nprogress/nprogress.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link href="assets/css/animate.css/animate.min.css" rel="stylesheet">
+  <!-- validate -->
+  <link href="assets/css/fv.css" rel="stylesheet">
+  <!-- Custom Theme Style -->
+  <link href="assets/css/custom.css" rel="stylesheet">
+
+
+</head>
+
+<body class="login">
+  <div>
+    <a class="hiddenanchor" id="signup"></a>
+    <a class="hiddenanchor" id="signin"></a>
+
+    <div class="login_wrapper">
+      <div class="animate form login_form">
+        <section class="login_content">
+          <div id="error"></div>
+          <form id="frmLogin" novalidate>
+            <h1>Login Form</h1>
+            <fieldset>
+              <div class="item form-group">
+                <input type="text" class="form-control" placeholder="Username" id="username" required="required" />
+              </div>
+
+              <div class="item form-group">
+                <input type="password" class="form-control" placeholder="Password" id="password" required="required" />
+              </div>
+            </fieldset>
+
+            <div>
+              <button id="btnProducto" type="submit" class="btn btn-success">Log in</button>
+              <a class="reset_pass" href="#"> Recuperar su contraseña!</a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="separator">
+              <p class="change_link">Nuevo en el sitio?
+                <a href="#signup" class="to_register"> Crear Cuenta </a>
+              </p>
+
+              <div class="clearfix"></div>
+              <br />
+
+              <div>
+                <h1>
+                  <i class="glyphicon glyphicon-share-alt"></i> Story Labs!</h1>
+                <!-- <p>©2018 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p> -->
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div id="register" class="animate form registration_form">
+        <section class="login_content">
+          <form>
+            <h1>Crear Cuenta</h1>
+            <div>
+              <input type="text" class="form-control" placeholder="Username" required="" />
+            </div>
+            <div>
+              <input type="email" class="form-control" placeholder="Email" required="" />
+            </div>
+            <div>
+              <input type="password" class="form-control" placeholder="Password" required="" />
+            </div>
+            <div>
+              <a class="btn btn-default submit" href="index.html">Submit</a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="separator">
+              <p class="change_link">Ya eres miembro ?
+                <a href="#signin" class="to_register"> Log in </a>
+              </p>
+
+              <div class="clearfix"></div>
+              <br />
+
+              <div>
+                <h1>
+                  <i class="glyphicon glyphicon-share-alt"></i> Story Labs!</h1>
+                <!-- <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p> -->
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="assets/js/jquery.min.js"></script>
+  <!-- JS Scripts -->
+  <script src="assets/js/Login.js"></script>
+  <!-- Custom Theme Scripts -->
+  <script src="assets/js/custom.min.js"></script>
+  <!-- Validator -->
+  <script src="assets/js/validator.js"></script>
+</body>
+
+</html>

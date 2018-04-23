@@ -25,6 +25,10 @@ if(isset($_POST["action"])){
             $usuario->password= $_POST["password"];
             echo json_encode($usuario->Login());
             break;   
+        case "CheckSession":
+            $_SESSION['url']= $_POST["url"];
+            echo json_encode($usuario->CheckSession());
+            break;   
     }
 }
 
@@ -58,15 +62,19 @@ class Usuario{
     }
 
     function CheckSession(){
-        if(isset($_SESSION["username"])){            
+        if(isset($_SESSION["username"])){    
+            // ****** VALIDA SI TIENE CREDENCIALES PARA LA URL CONSULTADA ******
+            // if(CheckRol($_SESSION["url"]))...
             $sessiondata['id']= $_SESSION["id"];
             $sessiondata['username']= $_SESSION["username"];
             $sessiondata['rol']= $_SESSION["rol"];
             $sessiondata['nombre']= $_SESSION["nombre"];
+            $sessiondata['url']= $_SESSION["url"];
             $sessiondata['status']= 'login';
             return $sessiondata;
         }
         else {            
+            $sessiondata['url']= $_SESSION["url"];
             $sessiondata['status']='invalido';
             return $sessiondata;
         }
@@ -77,6 +85,7 @@ class Usuario{
         unset($_SESSION['username']);
         unset($_SESSION['rol']);
         unset($_SESSION['nombre']);        
+        unset($_SESSION["url"]);
         $sessiondata['status']='invalido';
         return $sessiondata;
     }
@@ -92,11 +101,14 @@ class Usuario{
                 $_SESSION["username"]= $this->username;                
                 $_SESSION["rol"]= 'rol-prueba';
                 $_SESSION["nombre"]= 'nombre prueba';
-                //                
+                //          
+                //if(isset($_SESSION['url']))
+                $sessiondata['url']=  isset($_SESSION['url'])? $_SESSION['url'] : 'Dashboard.html';    
                 $sessiondata['status']='login'; 
                 return $sessiondata;
             }
             else {
+                $sessiondata['url']=  isset($_SESSION['url'])? $_SESSION['url'] : 'Dashboard.html';
                 $sessiondata['status']='invalido'; 
                 return $sessiondata;
             }

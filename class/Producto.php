@@ -26,13 +26,14 @@ if(isset($_POST["action"])){
 class Producto{
     public $id=null;
     public $nombre='';
+    public $nombreAbreviado='';
+    public $descripcion='';    
     public $cantidad=0;
-    public $scancode='';
     public $precio=0;
-    public $codigorapido='';
-    public $idcategoria='';
+    public $scancode='';
+    public $codigoRapido='';
     public $fechaExpiracion=null;
-    public $descripcion='';
+    
 
     function __construct(){
         require_once("Conexion.php");
@@ -47,19 +48,19 @@ class Producto{
             $obj= json_decode($_POST["obj"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
+            $this->nombreAbreviado= $obj["nombreAbreviado"] ?? '';
             $this->descripcion= $obj["descripcion"] ?? '';
             $this->cantidad= $obj["cantidad"] ?? 0;            
-            $this->scancode= $obj["scancode"] ?? '';
             $this->precio= $obj["precio"] ?? 0;
-            $this->codigorapido= $obj["codigorapido"] ?? 0;
-            $this->idcategoria= $obj["idcategoria"] ?? null;
+            $this->scancode= $obj["scancode"] ?? '';            
+            $this->codigoRapido= $obj["codigoRapido"] ?? 0;            
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
         }
     }
 
     function ReadAll(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigorapido
+            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigoRapido
                 FROM     producto       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
@@ -76,7 +77,7 @@ class Producto{
 
     function Read(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion, descripcion
+            $sql='SELECT id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion
                 FROM producto  
                 where id=:id';
             $param= array(':id'=>$this->id);
@@ -94,10 +95,11 @@ class Producto{
 
     function Create(){
         try {
-            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion, descripcion)
-                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion, :descripcion)";              
+            $sql="INSERT INTO producto   (id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion)
+                VALUES (uuid(),:nombre, :nombreAbreviado, :descripcion, :cantidad, :precio, :scancode, :codigoRapido, :fechaExpiracion)";
             //
-            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
+            $param= array(':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio,
+                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
@@ -117,9 +119,10 @@ class Producto{
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion, descripcion= :descripcion
+                SET nombre=:nombre, nombreAbreviado=:nombreAbreviado, descripcion= :descripcion, cantidad=:cantidad, precio=:precio, scancode=:scancode, codigoRapido=:codigoRapido, fechaExpiracion=:fechaExpiracion
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio , 
+                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
                 return true;

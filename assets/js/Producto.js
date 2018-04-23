@@ -54,7 +54,7 @@ class Producto {
             .fail(function (e) {
                 producto.showError(e);
             })
-            .always(function () {                
+            .always(function () {
                 setTimeout('$("#btnProducto").removeAttr("disabled")', 1000);
                 producto = new Producto();
                 producto.ClearCtls();
@@ -132,21 +132,22 @@ class Producto {
         $("#scancode").val('');
         $("#codigoRapido").val('');
         $("#fechaExpiracion").val('');
-        $("#categoria").val('optdef');        
+        $("#categoria").val('optdef');
     };
 
     ShowAll(e) {
         // Limpia el div que contiene la tabla.
         $('#tableBody-Producto').html("");
-        // Carga lista
+        // // Carga lista
         var data = JSON.parse(e);
+        //style="display: none"
         $.each(data, function (i, item) {
             $('#tableBody-Producto').append(`
                 <tr> 
                     <td class="a-center ">
                         <input type="checkbox" class="flat" name="table_records"> 
                     </td>
-                    <td class="itemId" style="display: none" >${item.id}</td>
+                    <td class="itemId"  >${item.id}</td>
                     <td>${item.nombre}</td>
                     <td>${item.codigoRapido}</td>
                     <td>${item.cantidad}</td>
@@ -161,26 +162,41 @@ class Producto {
             $('.update').click(producto.UpdateEventHandler);
             $('.delete').click(producto.DeleteEventHandler);
         })
-        var dataTable =$("datatable").DataTable({ 
-            "order": [[ 2, "asc" ]]
-        } ); 
 
-$.fn.dataTableExt.afnFiltering.push(
-  function(oSettings, aData, iDataIndex) {
-      var keywords = $(".dataTables_filter input").val().split(' ');  
-      var matches = 0;
-      for (var k=0; k<keywords.length; k++) {
-          var keyword = keywords[k];
-          for (var col=0; col<aData.length; col++) {
-              if (aData[col].indexOf(keyword)>-1) {
-                  matches++;
-                  break;
-              }
-          }
-      }
-      return matches == keywords.length;
-   }
-);
+        // var dataTable =$("datatable").DataTable({ 
+        //     "order": [[ 2, "asc" ]]
+        // } ); 
+
+        var dataObject = {
+            columns: [{
+                title: "ID"
+            }, {
+                title: "COUNTY"
+            }]
+        };
+        var columns = [];
+
+        $('#dsProducto').DataTable( {
+            paging: true,
+            search:true
+        } );
+
+        // $.fn.dataTableExt.afnFiltering.push(
+        // function(oSettings, aData, iDataIndex) {
+        //     var keywords = $(".dataTables_filter input").val().split(' ');  
+        //     var matches = 0;
+        //     for (var k=0; k<keywords.length; k++) {
+        //         var keyword = keywords[k];
+        //         for (var col=0; col<aData.length; col++) {
+        //             if (aData[col].indexOf(keyword)>-1) {
+        //                 matches++;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     return matches == keywords.length;
+        // }
+        // );
     };
 
     UpdateEventHandler() {

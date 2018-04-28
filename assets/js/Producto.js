@@ -145,39 +145,63 @@ class Producto {
             $('#tableBody-Producto').append(`
                 <tr> 
                     <td class="a-center ">
-                        <input type="checkbox" class="flat" name="table_records"> 
+                        <input type="checkbox" class="flat" name="table_records">
                     </td>
-                    <td class="itemId"  >${item.id}</td>
+                    <td class="itemId" >${item.id}</td>
                     <td>${item.nombre}</td>
                     <td>${item.codigoRapido}</td>
                     <td>${item.cantidad}</td>
                     <td>${item.precio}</td>
                     <td class=" last">
                         <a href="#" class="update" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
-                        <a href="#" class="delete"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a> 
+                        <a href="#" class="delete"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
                     </td>
                 </tr>
             `);
             // event Handler
             $('.update').click(producto.UpdateEventHandler);
             $('.delete').click(producto.DeleteEventHandler);
-        })
-        //datatable 
-        $('#dsProducto').DataTable( {
-            paging: true,
-            search:true
-        } );
+        })        
+        //datatable         
+        if ( $.fn.dataTable.isDataTable( '#dsProducto' ) ) {
+            var table = $('#dsProducto').DataTable();
+            //table.destroy();
+        }
+        /*else {
+            table = $('#example').DataTable( {
+                paging: false
+            } );
+        }*/
+        else 
+            $('#dsProducto').DataTable( {
+                columns: [
+                    { title: "Check" },
+                    { title: "ID"
+                        //,visible: false
+                    },
+                    { title: "Nombre" },
+                    { title: "Código Rapido" },
+                    { title: "Cantidad" },
+                    { title: "Precio" },
+                    { title: "Action" }
+                ],          
+                paging: true,
+                search: true
+            } );
+
+
         // var dataTable =$("datatable").DataTable({ 
         //     "order": [[ 2, "asc" ]]
         // } ); 
 
         // var dataObject = {
-        //     columns: [{
+        //     data: [{
         //         title: "ID"
         //     }, {
         //         title: "COUNTY"
         //     }]
         // };
+
         // var columns = [];
         // $.fn.dataTableExt.afnFiltering.push(
         // function(oSettings, aData, iDataIndex) {

@@ -28,7 +28,10 @@ if(isset($_POST["action"])){
         case "CheckSession":
             $_SESSION['url']= $_POST["url"];
             echo json_encode($usuario->CheckSession());
-            break;   
+            break;
+        case "EndSession":
+            echo json_encode($usuario->EndSession());
+            break;
     }
 }
 
@@ -98,7 +101,7 @@ class Usuario{
             if($data){
                 // Session
                 $_SESSION["id"]= '011';
-                $_SESSION["username"]= $this->username;                
+                $_SESSION["username"]= 'xxxx ssss xxxx';//$this->username;                
                 $_SESSION["rol"]= 'rol-prueba';
                 $_SESSION["nombre"]= 'nombre prueba';
                 //          

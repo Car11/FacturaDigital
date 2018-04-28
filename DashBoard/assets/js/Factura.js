@@ -1,6 +1,6 @@
 class Factura {
     // Constructor
-    constructor(id, cajero, subtotal, descuento, producto, total, fechaCreacion, idfila, p_codigo, p_descripcion, p_precio, p_cantidad, importe) {
+    constructor(id, cajero, subtotal, descuento, producto, total, fechaCreacion, idfila, codigorapido, scancode, descripcion, precio, cantidad, importe) {
         this.id = id || null;
         this.cajero = cajero || '';
         this.subtotal=subtotal || '';
@@ -9,9 +9,10 @@ class Factura {
         this.total= total || '';
         this.fechaCreacion= fechaCreacion || null;
         this.idfila=idfila || 0;
-        this.p_codigo= p_codigo || '';
-        this.p_precio=p_precio || 0;
-        this.p_cantidad=p_cantidad || 0;
+        this.codigorapido= codigorapido || '';
+        this.scancode= scancode || '';
+        this.precio= precio || 0;
+        this.cantidad=cantidad || 0;
         this.importe=importe || 0;
     }
 
@@ -25,7 +26,13 @@ let factura = new Factura();
 var UltProTou = ""; //Ultimo Producto Tocado -- Sirve para identificar cual fue el ultimo producto que se agrego o se modifico en la lista
 
 $(document).ready(function () {
-
+    $('#reload').click(function() {
+        // Recargo la página
+        location.reload();
+    });
+    $('#open_modal_fac').click(function(){
+        $('#total_pagar').append( $("#total")[0].textContent );
+    });
 });
 
 //Valida si se presiona enter -> carga el producto en la lista
@@ -37,7 +44,6 @@ $("#p_searh").keyup(function(e) {
     }
     if (e.which == 106) {
         $("#p_searh")[0].value = "";
-        // $("#cant_"+ document.getElementById("productos").lastChild.childNodes[3].innerText).focus().select();;
         // se usa UltProTou xq es el UltimoProductoTocado (si la cantidad del producto es alterada no hay forma de saber cual fue el ultimo modificado.)
         $("#cant_"+ UltProTou).focus().select(); 
     }
@@ -45,15 +51,16 @@ $("#p_searh").keyup(function(e) {
 
 
 
-// Carga los productos a la lista de la factura
+// Carga el producto a la lista de la factura
 function LoadProducto() {
-    factura.p_codigo = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
+    factura.codigorapido = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
+    factura.scancode = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
     $.ajax({
         type: "POST",
-        url: "class/Factura.php",
+        url: "class/Producto.php",
         data: {
-            action: "LoadProducto",
-            producto: JSON.stringify(factura)
+            action: "CheckRelatedItems",
+            obj: JSON.stringify(factura)
         }
     })
     .done(function (e) {
@@ -64,6 +71,7 @@ function LoadProducto() {
         showError(e);
     });
 };
+
 // valida que el producto nuevo a ingresar no este en la lista
 // si esta en la lista lo suma a la cantidad
 // si es nuevo lo agrega a la lista
@@ -210,47 +218,53 @@ $( "#fac-cash" ).click(function(event) {
 
 });
 
-
 function facturar(metodo){
-    alert("EFECTIVO");
-    if (metodo == "cash"){
-        alert("EFECTIVO");
-    }
-    if (metodo=="creditcard") {
-        alert ("TARJETA");
-    }
+    CleanCtls();
+
+
 };
+//BORRAR
+// function facturar(metodo){
+//     alert("EFECTIVO");
+//     if (metodo == "cash"){
+//         alert("EFECTIVO");
+//     }
+//     if (metodo=="creditcard") {
+//         alert ("TARJETA");
+//     }
+// };
+
 // Carga lista
-function LoadAll() {
-    id=null;
-    $.ajax({
-        type: "POST",
-        url: "../../class/Producto.php",
-        data: {
-            action: "LoadAll"
-        }
-    })
-    .done(function (e) {
-        CleanCtls();
-        showData(e);
-    })
-    .fail(function (e) {
-        showError(e);
-    });
-};
+// function LoadAll() {
+//     id=null;
+//     $.ajax({
+//         type: "POST",
+//         url: "../../class/Producto.php",
+//         data: {
+//             action: "LoadAll"
+//         }
+//     })
+//     .done(function (e) {
+//         CleanCtls();
+//         showData(e);
+//     })
+//     .fail(function (e) {
+//         showError(e);
+//     });
+// };
 
 // Muestra información en ventana
-function showInfo() {
-    //$(".modal").css({ display: "none" });  
+// function showInfo() {
+//     //$(".modal").css({ display: "none" });  
     
-    // swal({
-    //     position: 'top-end',
-    //     type: 'success',
-    //     title: 'Good!',
-    //     showConfirmButton: false,
-    //     timer: 1500
-    // });
-};
+//     // swal({
+//     //     position: 'top-end',
+//     //     type: 'success',
+//     //     title: 'Good!',
+//     //     showConfirmButton: false,
+//     //     timer: 1500
+//     // });
+// };
 
 // Muestra errores en ventana
 function showError(e) {    
@@ -265,112 +279,112 @@ function showError(e) {
     //   })
 };
 
-function showData(e) {
-    // Limpia el div que contiene la tabla.
-    $('#tableBody-Producto').html("");
-    // carga lista con datos.
-    var data = JSON.parse(e);
-    // Recorre arreglo.
-    $.each(data, function (i, item) {
-        var row =
-            '<tr>' +
-                '<td>' + item.id + '</td>' +
-                '<td>' + item.nombre + '</td>' +
-                '<td>' + item.scancode + '</td>' +
-                '<td>' + item.cantidad + '</td>' +
-                '<td>' + item.precio + '</td>' +
-                '<td>' + item.codigorapido + '</td>' +
-                '<td><img id=btnmodingreso'+ item.id + ' src=img/file_mod.png></td>'+
-                '<td><img id=btnborraingreso'+ item.id + ' src=img/file_delete.png></td>'+
-            '</tr>';
-        $('#tableBody-Producto').append(row);
-        // evento click del boton modificar-eliminar
-        $('#btnmodingreso' + item.id).click(UpdateEventHandler);
-        $('#btnborraingreso' + item.id).click(DeleteEventHandler);
-    })
-};
+// function showData(e) {
+//     // Limpia el div que contiene la tabla.
+//     $('#tableBody-Producto').html("");
+//     // carga lista con datos.
+//     var data = JSON.parse(e);
+//     // Recorre arreglo.
+//     $.each(data, function (i, item) {
+//         var row =
+//             '<tr>' +
+//                 '<td>' + item.id + '</td>' +
+//                 '<td>' + item.nombre + '</td>' +
+//                 '<td>' + item.scancode + '</td>' +
+//                 '<td>' + item.cantidad + '</td>' +
+//                 '<td>' + item.precio + '</td>' +
+//                 '<td>' + item.codigorapido + '</td>' +
+//                 '<td><img id=btnmodingreso'+ item.id + ' src=img/file_mod.png></td>'+
+//                 '<td><img id=btnborraingreso'+ item.id + ' src=img/file_delete.png></td>'+
+//             '</tr>';
+//         $('#tableBody-Producto').append(row);
+//         // evento click del boton modificar-eliminar
+//         $('#btnmodingreso' + item.id).click(UpdateEventHandler);
+//         $('#btnborraingreso' + item.id).click(DeleteEventHandler);
+//     })
+// };
 
-function showDataCategoria(e) {
-    // carga lista con datos.
-    var data = JSON.parse(e);
-    // Recorre arreglo.
-    $.each(data, function (i, item) {
-        var opt =
-            '<option value="'+ item.id + '">'+ item.nombre + '</option>';
-        $('#categoria').append(opt);
-        // evento click del boton modificar-eliminar
-        //$('#option' + item.id).click(event-handler);
-    })
-};
+// function showDataCategoria(e) {
+//     // carga lista con datos.
+//     var data = JSON.parse(e);
+//     // Recorre arreglo.
+//     $.each(data, function (i, item) {
+//         var opt =
+//             '<option value="'+ item.id + '">'+ item.nombre + '</option>';
+//         $('#categoria').append(opt);
+//         // evento click del boton modificar-eliminar
+//         //$('#option' + item.id).click(event-handler);
+//     })
+// };
 
-function UpdateEventHandler() {
-    producto.id = $(this).parents("tr").find("td").eq(0).text();  //Columna 0 de la fila seleccionda= ID.
-    $.ajax({
-        type: "POST",
-        url: "class/Producto.php",
-        data: {
-            action: 'Load',
-            producto: JSON.stringify(producto)
-        }
-    })
-    .done(function (e) {
-        ShowItemData(e);
-    })
-    .fail(function (e) {
-        showError(e);
-    });
-};
+// function UpdateEventHandler() {
+//     producto.id = $(this).parents("tr").find("td").eq(0).text();  //Columna 0 de la fila seleccionda= ID.
+//     $.ajax({
+//         type: "POST",
+//         url: "class/Producto.php",
+//         data: {
+//             action: 'Load',
+//             producto: JSON.stringify(producto)
+//         }
+//     })
+//     .done(function (e) {
+//         ShowItemData(e);
+//     })
+//     .fail(function (e) {
+//         showError(e);
+//     });
+// };
 
-function DeleteEventHandler() {
-    producto.id = $(this).parents("tr").find("td").eq(0).text(); //Columna 0 de la fila seleccionda= ID.
-    // Mensaje de borrado:
-    swal({
-        title: 'Eliminar?',
-        text: "Esta acción es irreversible!",
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Si, eliminar!',
-        cancelButtonText: 'No, cancelar!',
-        confirmButtonClass: 'btn btn-success',
-        cancelButtonClass: 'btn btn-danger'
-    }).then(function () {
-        // eliminar registro.
-        Delete();
-    })
-};
+// function DeleteEventHandler() {
+//     producto.id = $(this).parents("tr").find("td").eq(0).text(); //Columna 0 de la fila seleccionda= ID.
+//     // Mensaje de borrado:
+//     swal({
+//         title: 'Eliminar?',
+//         text: "Esta acción es irreversible!",
+//         type: 'warning',
+//         showCancelButton: true,
+//         confirmButtonColor: '#3085d6',
+//         cancelButtonColor: '#d33',
+//         confirmButtonText: 'Si, eliminar!',
+//         cancelButtonText: 'No, cancelar!',
+//         confirmButtonClass: 'btn btn-success',
+//         cancelButtonClass: 'btn btn-danger'
+//     }).then(function () {
+//         // eliminar registro.
+//         Delete();
+//     })
+// };
 
-function Delete() {
-    $.ajax({
-        type: "POST",
-        url: "class/Producto.php",
-        data: { 
-            action: 'Delete',                
-            producto:  JSON.stringify(producto)
-        }            
-    })
-    .done(function( e ) {
-        var data = JSON.parse(e);   
-        if(data.status==1)
-        {
-            swal(
-                'Mensaje!',
-                'El registro se encuentra  en uso, no es posible eliminar.',
-                'error'
-            );
-        }
-        else swal(
-            'Eliminado!',
-            'El registro se ha eliminado.',
-            'success'
-        );
-    })    
-    .fail(function (e) {
-        showError(e);
-    })
-    .always(LoadAll);
-};
+// function Delete() {
+//     $.ajax({
+//         type: "POST",
+//         url: "class/Producto.php",
+//         data: { 
+//             action: 'Delete',                
+//             producto:  JSON.stringify(producto)
+//         }            
+//     })
+//     .done(function( e ) {
+//         var data = JSON.parse(e);   
+//         if(data.status==1)
+//         {
+//             swal(
+//                 'Mensaje!',
+//                 'El registro se encuentra  en uso, no es posible eliminar.',
+//                 'error'
+//             );
+//         }
+//         else swal(
+//             'Eliminado!',
+//             'El registro se ha eliminado.',
+//             'success'
+//         );
+//     })    
+//     .fail(function (e) {
+//         showError(e);
+//     })
+//     .always(LoadAll);
+// };
 
 function CleanCtls() {
     $("#p_searh").val('');
@@ -382,48 +396,48 @@ function CleanCtls() {
     // $("#categoria").val('optdef');
 };
 
-function ShowItemData(e) {
-    // Limpia el controles
-    CleanCtls();    
-    // carga objeto.
-    var data = JSON.parse(e)[0];
-    producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
-    // Asigna objeto a controles
-    $("#id").val(producto.id);
-    $("#nombre").val(producto.nombre);
-    $("#precio").val(producto.precio);
-    $("#cantidad").val(producto.cantidad);
-    $("#codigorapido").val(producto.codigorapido);
-    $("#categoria").val(producto.idcategoria);
-    $("#fechaExpiracion").val(producto.fechaExpiracion);
-};
+// function ShowItemData(e) {
+//     // Limpia el controles
+//     CleanCtls();    
+//     // carga objeto.
+//     var data = JSON.parse(e)[0];
+//     producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
+//     // Asigna objeto a controles
+//     $("#id").val(producto.id);
+//     $("#nombre").val(producto.nombre);
+//     $("#precio").val(producto.precio);
+//     $("#cantidad").val(producto.cantidad);
+//     $("#codigorapido").val(producto.codigorapido);
+//     $("#categoria").val(producto.idcategoria);
+//     $("#fechaExpiracion").val(producto.fechaExpiracion);
+// };
 
-function Save(){   
-    // Ajax: insert / Update.
-    var miAccion= producto.id==null ? 'Insert' : 'Update';
-    producto.nombre = $("#nombre").val();
-    producto.cantidad = $("#cantidad").val();
-    producto.precio = $("#precio").val();
-    producto.codigorapido = $("#codigorapido").val();
-    producto.idcategoria= $("#categoria").val();
-    producto.fechaExpiracion= $("#fechaExpiracion").val();
-    //
-    $.ajax({
-        type: "POST",
-        url: "../../../class/Producto.php",
-        data: { 
-            action: miAccion,  
-            producto: JSON.stringify(producto)
-        }
-    })
-    .done(showInfo)
-    .fail(function (e) {
-        showError(e);
-    })
-    .always(function() {
-        setTimeout('$("#btnProducto").removeAttr("disabled")', 1500);
-        LoadAll();   
-    });
-}; 
+// function Save(){   
+//     // Ajax: insert / Update.
+//     var miAccion= producto.id==null ? 'Insert' : 'Update';
+//     producto.nombre = $("#nombre").val();
+//     producto.cantidad = $("#cantidad").val();
+//     producto.precio = $("#precio").val();
+//     producto.codigorapido = $("#codigorapido").val();
+//     producto.idcategoria= $("#categoria").val();
+//     producto.fechaExpiracion= $("#fechaExpiracion").val();
+//     //
+//     $.ajax({
+//         type: "POST",
+//         url: "../../../class/Producto.php",
+//         data: { 
+//             action: miAccion,  
+//             producto: JSON.stringify(producto)
+//         }
+//     })
+//     .done(showInfo)
+//     .fail(function (e) {
+//         showError(e);
+//     })
+//     .always(function() {
+//         setTimeout('$("#btnProducto").removeAttr("disabled")', 1500);
+//         LoadAll();   
+//     });
+// }; 
 
 

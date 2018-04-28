@@ -20,6 +20,9 @@ if(isset($_POST["action"])){
         case "Delete":
             $producto->Delete();
             break;   
+        case "CheckRelatedItems":
+            echo json_encode($producto->CheckRelatedItems());
+            break;
     }
 }
 
@@ -136,14 +139,15 @@ class Producto{
 
     function CheckRelatedItems(){
         try{
-            $sql="SELECT id
-                FROM /*  definir relacion */ R
-                WHERE R./*definir campo relacion*/= :id";                
-            $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql, $param);
-            if(count($data))
-                return true;
-            else return false;
+            $sql="SELECT id, cantidad, precio, codigorapido, descripcion FROM producto WHERE codigorapido =:codigorapido OR scancode =:scancode";
+            $param= array(':codigorapido'=>$this->codigorapido,':scancode'=>$this->scancode);
+            // $sql="SELECT id, cantidad, precio, codigorapido, descripcion FROM producto WHERE codigorapido =:codigorapido";
+            // $param= array(':codigorapido'=>$this->codigo);
+            $data= DATA::Ejecutar($sql,$param);
+            return $data;
+            // if(count($data))
+            //     return true;
+            // else return false;
         }
         catch(Exception $e){
             header('HTTP/1.0 400 Bad error');

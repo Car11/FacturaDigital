@@ -8,9 +8,9 @@ var Session=  {
             data: {
                 action: 'CheckSession',
                 url: window.location.href,
-                success: function(data) {
-                    return data;
-                }
+                // success: function(data) {
+                //     return data;
+                // }
             }
         })
         .done(function( e ) {

@@ -1,4 +1,7 @@
 <?php
+require_once("Conexion.php");
+//require_once("Log.php");
+//require_once('Globals.php');
 // Eventos del usuario.
 require_once('Evento.php');
 
@@ -44,7 +47,6 @@ abstract class userSessionStatus
     const invalido = 'invalido'; // login invalido
     const login = 'login'; // login ok; credencial ok
     const nocredencial= 'nocredencial'; // login ok; sin credenciales
-    // etc.
 }
 
 class Usuario{
@@ -59,10 +61,6 @@ class Usuario{
     public $url;    
 
     function __construct(){
-        require_once("Conexion.php");
-        //require_once("Log.php");
-        //require_once('Globals.php');
-        //
         // identificador único
         if(isset($_POST["id"])){
             $this->id= $_POST["id"];

@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `faccr` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `faccr`;
 -- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: faccr
@@ -18,12 +16,30 @@ USE `faccr`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping events for database 'faccr'
+-- Table structure for table `categoriasxproducto`
 --
 
+DROP TABLE IF EXISTS `categoriasxproducto`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `categoriasxproducto` (
+  `idproducto` char(36) NOT NULL,
+  `idcategoria` char(36) NOT NULL,
+  PRIMARY KEY (`idproducto`,`idcategoria`),
+  KEY `idcat-prod_idx` (`idcategoria`),
+  CONSTRAINT `idcat-prod` FOREIGN KEY (`idcategoria`) REFERENCES `categoria` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `idprod-cat` FOREIGN KEY (`idproducto`) REFERENCES `producto` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
--- Dumping routines for database 'faccr'
+-- Dumping data for table `categoriasxproducto`
 --
+
+LOCK TABLES `categoriasxproducto` WRITE;
+/*!40000 ALTER TABLE `categoriasxproducto` DISABLE KEYS */;
+/*!40000 ALTER TABLE `categoriasxproducto` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -34,4 +50,4 @@ USE `faccr`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-10 16:35:59
+-- Dump completed on 2018-05-02  1:18:09

@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `faccr` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `faccr`;
 -- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: faccr
@@ -18,34 +16,28 @@ USE `faccr`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `producto`
+-- Table structure for table `evento`
 --
 
-DROP TABLE IF EXISTS `producto`;
+DROP TABLE IF EXISTS `evento`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `producto` (
+CREATE TABLE `evento` (
   `id` char(36) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `scancode` varchar(45) DEFAULT NULL,
-  `cantidad` int(11) NOT NULL,
-  `precio` int(11) DEFAULT NULL,
-  `codigorapido` varchar(45) DEFAULT NULL,
-  `idcategoria` char(36) DEFAULT NULL,
-  `fechaExpiracion` date DEFAULT NULL,
-  `descripcion` varchar(1000) DEFAULT NULL,
+  `nombre` varchar(45) NOT NULL,
+  `url` varchar(400) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `producto`
+-- Dumping data for table `evento`
 --
 
-LOCK TABLES `producto` WRITE;
-/*!40000 ALTER TABLE `producto` DISABLE KEYS */;
-INSERT INTO `producto` VALUES ('1568e1aa-233a-11e8-9244-54ee75873a76','eee','',5,5,'456',NULL,NULL,NULL),('1e200d9f-2358-11e8-a311-54ee75873a76','t','',0,5,'5',NULL,'0000-00-00',NULL),('3d2e9d4f-238f-11e8-a311-54ee75873a76','oo','',0,0,'0','d67c3eb9-2385-11e8-a311-54ee75873a76','2018-03-10',NULL),('9444176e-238e-11e8-a311-54ee75873a76','t','',7,7,'7','d67c3eb9-2385-11e8-a311-54ee75873a76','2012-12-12',NULL),('9b7f519b-2339-11e8-9244-54ee75873a76','aa','',55,101,'116',NULL,NULL,NULL),('b40f556a-238a-11e8-a311-54ee75873a76','cfmk','',5,7500,'0055','cccca0b4-2385-11e8-a311-54ee75873a76','2018-03-09',NULL),('f76d14ed-238c-11e8-a311-54ee75873a76','55','',55,55,'66','d67c3eb9-2385-11e8-a311-54ee75873a76','2018-03-01',NULL);
-/*!40000 ALTER TABLE `producto` ENABLE KEYS */;
+LOCK TABLES `evento` WRITE;
+/*!40000 ALTER TABLE `evento` DISABLE KEYS */;
+INSERT INTO `evento` VALUES ('1ed3a48c-3e44-11e8-9ddb-54ee75873a69','Dashboard','Dashboard.html'),('1ed3a48c-3e44-11e8-9ddb-54ee75873a70','Producto','Producto.html'),('1ed3a48c-3e44-11e8-9ddb-54ee75873a71','Inventario','Inventario.html'),('1ed3a48c-3e44-11e8-9ddb-54ee75873a72','Factura','Facturacion.html');
+/*!40000 ALTER TABLE `evento` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -57,4 +49,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-10 16:35:59
+-- Dump completed on 2018-05-02  1:18:08

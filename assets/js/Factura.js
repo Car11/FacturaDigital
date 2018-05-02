@@ -17,7 +17,7 @@ class Factura {
 
     //Get
     get Importe() {
-    return this.cantidad * this.precio;
+        return this.cantidad * this.precio;
     }
 }
 
@@ -25,9 +25,6 @@ let factura = new Factura();
 
 $(document).ready(function () {
     Session.Check();
-    //while(Session.state==undefined){}
-    //if(!Session.state)
-    //    return;
 //     if(!Session.state)
 //         return;
     // Load list

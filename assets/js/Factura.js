@@ -24,6 +24,12 @@ class Factura {
 let factura = new Factura();
 
 $(document).ready(function () {
+    Session.Check();
+    //while(Session.state==undefined){}
+    //if(!Session.state)
+    //    return;
+//     if(!Session.state)
+//         return;
     // Load list
     //LoadAll();
     //LoadCategories();

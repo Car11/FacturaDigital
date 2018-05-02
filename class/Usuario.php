@@ -1,4 +1,7 @@
 <?php
+// Eventos del usuario.
+require_once('Evento.php');
+
 if (!isset($_SESSION))
     session_start();
 
@@ -23,28 +26,37 @@ if(isset($_POST["action"])){
         case "Login":
             $usuario->username= $_POST["username"];
             $usuario->password= $_POST["password"];
-            echo json_encode($usuario->Login());
+            $usuario->Login();
+            echo json_encode($_SESSION['usersession']);
             break;   
-        case "CheckSession":
-            $_SESSION['url']= $_POST["url"];
-            echo json_encode($usuario->CheckSession());
+        case "CheckSession":            
+            $usuario->CheckSession();
+            echo json_encode($_SESSION['usersession']);
             break;
         case "EndSession":
-            echo json_encode($usuario->EndSession());
-            break;
+            $usuario->EndSession();
+            break;        
     }
 }
 
+abstract class userSessionStatus
+{
+    const invalido = 'invalido'; // login invalido
+    const login = 'login'; // login ok; credencial ok
+    const nocredencial= 'nocredencial'; // login ok; sin credenciales
+    // etc.
+}
+
 class Usuario{
-  
     public $id;
     public $username;
     public $password;
-    public $rol;
     public $nombre;
     public $email;
-    public $is_active;
-    //private $sessiondata = array(); // devuelve el estado del login.
+    public $activo = 0;
+    public $status = userSessionStatus::invalido;
+    public $eventos= array(); // array de eventos del usuario.
+    public $url;    
 
     function __construct(){
         require_once("Conexion.php");
@@ -59,64 +71,77 @@ class Usuario{
             $obj= json_decode($_POST["obj"],true);
             $this->id= $obj["id"] ?? null;
             $this->id= $obj["username"] ?? '';
-            $this->nombre= $obj["nombre"] ?? '';
-            
+            $this->nombre= $obj["nombre"] ?? '';            
         }
     }
 
     function CheckSession(){
-        if(isset($_SESSION["username"])){    
-            // ****** VALIDA SI TIENE CREDENCIALES PARA LA URL CONSULTADA ******
-            // if(CheckRol($_SESSION["url"]))...
-            $sessiondata['id']= $_SESSION["id"];
-            $sessiondata['username']= $_SESSION["username"];
-            $sessiondata['rol']= $_SESSION["rol"];
-            $sessiondata['nombre']= $_SESSION["nombre"];
-            $sessiondata['url']= $_SESSION["url"];
-            $sessiondata['status']= 'login';
-            return $sessiondata;
+        if(isset($_SESSION["usersession"]->id)){
+            // VALIDA SI TIENE CREDENCIALES PARA LA URL CONSULTADA
+            $_SESSION['usersession']->status= userSessionStatus::nocredencial;
+            $_SESSION['usersession']->url = $_POST["url"];
+            $urlarr = explode('/', $_SESSION['usersession']->url);
+            $myUrl = end($urlarr);
+            foreach ($_SESSION['usersession']->eventos as $evento) {
+                if($myUrl==$evento->url){
+                    $_SESSION['usersession']->status= userSessionStatus::login;
+                    break;
+                }
+            }
         }
-        else {            
-            $sessiondata['url']= $_SESSION["url"];
-            $sessiondata['status']='invalido';
-            return $sessiondata;
+        else {
+            $this->status= userSessionStatus::invalido;
+            $this->url = $_POST["url"];
+            $_SESSION["usersession"]= $this;
         }
     }
 
     function EndSession(){
-        unset($_SESSION['id']);
-        unset($_SESSION['username']);
-        unset($_SESSION['rol']);
-        unset($_SESSION['nombre']);        
-        unset($_SESSION["url"]);
-        $sessiondata['status']='invalido';
-        return $sessiondata;
+        unset($_SESSION['usersession']);
+        //return true;
     }
 
     function Login(){
         try {            
-            $sql='SELECT id, nombre /*,rol*/ FROM usuario where password=:password  AND username=:username';
+            $sql= 'SELECT u.id, u.username, u.nombre, activo, idevento, url
+                FROM usuario u inner join rolesxusuario ru on ru.idusuario = u.id
+                    inner join eventosxrol er on er.idrol = ru.idrol
+                    inner join evento e on e.id = er.idevento
+                    where password=:password  AND username=:username';
             $param= array(':username'=>$this->username, ':password'=>$this->password);   
             $data= DATA::Ejecutar($sql, $param);
             if($data){
-                // Session
-                $_SESSION["id"]= '011';
-                $_SESSION["username"]= 'xxxx ssss xxxx';//$this->username;                
-                $_SESSION["rol"]= 'rol-prueba';
-                $_SESSION["nombre"]= 'nombre prueba';
-                //          
-                //if(isset($_SESSION['url']))
-                $sessiondata['url']=  isset($_SESSION['url'])? $_SESSION['url'] : 'Dashboard.html';    
-                $sessiondata['status']='login'; 
-                return $sessiondata;
+                foreach ($data as $key => $value){
+                    // Session
+                    $evento= new Evento(); // evento con credencial del usuario.
+                    if($key==0){
+                        $this->id = $value['id'];
+                        $this->username = $value['username'];
+                        $this->nombre = $value['nombre'];
+                        $this->activo = $value['activo'];
+                        $this->status = userSessionStatus::login;
+                        $this->url = isset($_SESSION['usersession']->url)? $_SESSION['usersession']->url : 'Dashboard.html'; // Url consultada
+                        //
+                        $evento->id= $value['idevento'];
+                        $evento->url= $value['url'];
+                        $this->eventos = array($evento);
+                    }
+                    else {
+                        $evento->id= $value['idevento'];
+                        $evento->url= $value['url'];
+                        array_push ($this->eventos, $evento);
+                    }
+                    
+                }                
             }
             else {
-                $sessiondata['url']=  isset($_SESSION['url'])? $_SESSION['url'] : 'Dashboard.html';
-                $sessiondata['status']='invalido'; 
-                return $sessiondata;
+                unset($_SESSION["usersession"]);
+                $this->status= userSessionStatus::invalido;
             }
+            $_SESSION["usersession"]= $this;
         }     
         catch(Exception $e) {
+            unset($_SESSION["usersession"]);
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,

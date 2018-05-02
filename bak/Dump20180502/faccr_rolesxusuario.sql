@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `faccr` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `faccr`;
 -- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: faccr
@@ -18,27 +16,30 @@ USE `faccr`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `categoria`
+-- Table structure for table `rolesxusuario`
 --
 
-DROP TABLE IF EXISTS `categoria`;
+DROP TABLE IF EXISTS `rolesxusuario`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `categoria` (
-  `id` char(36) NOT NULL,
-  `nombre` char(45) NOT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `rolesxusuario` (
+  `idrol` char(36) NOT NULL,
+  `idusuario` char(36) NOT NULL,
+  PRIMARY KEY (`idrol`,`idusuario`),
+  KEY `usuario_idx` (`idusuario`),
+  CONSTRAINT `rol_usuario` FOREIGN KEY (`idrol`) REFERENCES `rol` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `usuario_usuario` FOREIGN KEY (`idusuario`) REFERENCES `usuario` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `categoria`
+-- Dumping data for table `rolesxusuario`
 --
 
-LOCK TABLES `categoria` WRITE;
-/*!40000 ALTER TABLE `categoria` DISABLE KEYS */;
-INSERT INTO `categoria` VALUES ('cccca0b4-2385-11e8-a311-54ee75873a76','Electrodomesticos'),('d67c3eb9-2385-11e8-a311-54ee75873a76','Hogar');
-/*!40000 ALTER TABLE `categoria` ENABLE KEYS */;
+LOCK TABLES `rolesxusuario` WRITE;
+/*!40000 ALTER TABLE `rolesxusuario` DISABLE KEYS */;
+INSERT INTO `rolesxusuario` VALUES ('1ed3a48c-3e44-11e8-9ddb-54ee75873a80','1ed3a48c-3e44-11e8-9ddb-54ee75873a60'),('1ed3a48c-3e44-11e8-9ddb-54ee75873a81','1ed3a48c-3e44-11e8-9ddb-54ee75873a76');
+/*!40000 ALTER TABLE `rolesxusuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -50,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-10 16:35:58
+-- Dump completed on 2018-05-02  1:18:09

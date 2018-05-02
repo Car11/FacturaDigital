@@ -1,4 +1,9 @@
 <?php
+require_once("Conexion.php");
+require_once("CategoriasxProducto.php");
+//require_once("Log.php");
+//require_once('Globals.php');
+//
 if (!isset($_SESSION))
     session_start();
 
@@ -33,13 +38,10 @@ class Producto{
     public $scancode='';
     public $codigoRapido='';
     public $fechaExpiracion=null;
+    public $categoria= array();
     
 
     function __construct(){
-        require_once("Conexion.php");
-        //require_once("Log.php");
-        //require_once('Globals.php');
-        //
         // identificador único
         if(isset($_POST["id"])){
             $this->id= $_POST["id"];
@@ -55,6 +57,14 @@ class Producto{
             $this->scancode= $obj["scancode"] ?? '';            
             $this->codigoRapido= $obj["codigoRapido"] ?? 0;            
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
+            //Categorias del producto.
+            if(isset($obj["categoria"] )){
+                foreach ($obj["categoria"] as $idcat) {
+                    $catprod= new CategoriasXProducto();
+                    $catprod->id= $idcat;
+                    array_push ($this->categoria, $catprod);
+                }
+            }
         }
     }
 
@@ -92,17 +102,21 @@ class Producto{
             );
         }
     }
-
+    d41d8cd9 8f00 b204 e980 0998ecf8427e
     function Create(){
         try {
             $sql="INSERT INTO producto   (id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion)
-                VALUES (uuid(),:nombre, :nombreAbreviado, :descripcion, :cantidad, :precio, :scancode, :codigoRapido, :fechaExpiracion)";
+                VALUES (uuid(),:nombre, :nombreAbreviado, :descripcion, :cantidad, :precio, :scancode, :codigoRapido, :fechaExpiracion);
+                
+                ";
             //
             $param= array(':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio,
                 ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
-            $data = DATA::Ejecutar($sql,$param,false);
+            $data = DATA::Ejecutar($sql,$param);
             if($data)
             {
+                //get id.
+                //save array obj
                 return true;
             }
             else throw new Exception('Error al guardar.', 02);
@@ -137,7 +151,7 @@ class Producto{
         }
     }   
 
-    function CheckRelatedItems(){
+    private function CheckRelatedItems(){
         try{
             $sql="SELECT id
                 FROM /*  definir relacion */ R

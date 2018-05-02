@@ -1,18 +1,22 @@
 <?php
+require_once("Conexion.php");
+//require_once("Log.php");
+//require_once('Globals.php');
+
 if (!isset($_SESSION))
     session_start();
 
 if(isset($_POST["action"])){
     $categoria= new Categoria();
     switch($_POST["action"]){
-        case "LoadAll":
-            echo json_encode($categoria->LoadAll());
+        case "ReadAll":
+            echo json_encode($categoria->ReadAll());
             break;
-        case "Load":
-            echo json_encode($categoria->Load());
+        case "Read":
+            echo json_encode($categoria->Read());
             break;
-        case "Insert":
-            $categoria->Insert();
+        case "Create":
+            $categoria->Create();
             break;
         case "Update":
             $categoria->Update();
@@ -26,22 +30,24 @@ if(isset($_POST["action"])){
 class Categoria{
     public $id=null;
     public $nombre='';
+    public $descripcion;
 
     function __construct(){
-        require_once("Conexion.php");
-        //require_once("Log.php");
-        //require_once('Globals.php');
-        //
+        // identificador único
+        if(isset($_POST["id"])){
+            $this->id= $_POST["id"];
+        }
         if(isset($_POST["categoria"])){
             $obj= json_decode($_POST["categoria"],true);
             $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
+            $this->descripcion= $obj["descripcion"] ?? '';
         }
     }
 
-    function LoadAll(){
+    function ReadAll(){
         try {
-            $sql='SELECT id, nombre 
+            $sql='SELECT id, nombre, descripcion
                 FROM     categoria       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
@@ -56,9 +62,9 @@ class Categoria{
         }
     }
 
-    function Load(){
+    function Read(){
         try {
-            $sql='SELECT id, nombre
+            $sql='SELECT id, nombre, descripcion
                 FROM categoria  
                 where id=:id';
             $param= array(':id'=>$this->id);
@@ -74,7 +80,7 @@ class Categoria{
         }
     }
 
-    function Insert(){
+    function Create(){
         try {
             $sql="INSERT INTO categoria   (id, nombre)
                 VALUES (uuid(), :nombre)";              

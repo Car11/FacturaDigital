@@ -1,6 +1,6 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion) {
+    constructor(id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion,cat) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.nombreAbreviado = nombreAbreviado || '';
@@ -10,6 +10,7 @@ class Producto {
         this.scancode = scancode || '';
         this.codigoRapido = codigoRapido || '';
         this.fechaExpiracion = fechaExpiracion || null;
+        this.categoria = cat || null;
     }
 
     //Getter
@@ -33,7 +34,8 @@ class Producto {
 
     get Save() {
         $('#btnProducto').attr("disabled", "disabled");
-        var miAccion = producto.id == null ? 'Create' : 'Update';
+        //var miAccion = producto.id == null ? 'Create' : 'Update';
+        var miAccion = this.id == null ? 'Create' : 'Update';
         this.nombre = $("#nombre").val();
         this.nombreAbreviado = $("#nombreAbreviado").val();
         this.descripcion = $("#descripcion").val();
@@ -42,6 +44,7 @@ class Producto {
         this.scancode = $("#scancode").val();
         this.codigoRapido = $("#codigoRapido").val();
         this.fechaExpiracion = $("#fechaExpiracion").val() == "" ? null : moment($("#fechaExpiracion").val(), 'DD/MM/YYYY').unix(); // UTC TIMESTAMP
+        this.categoria= $('#categoria > option').map(function() { return this.value; }).get();
         $.ajax({
             type: "POST",
             url: "class/Producto.php",
@@ -283,6 +286,7 @@ class Producto {
         document.forms[0].onreset = function (e) {
             validator.reset();
         }
+        
         //datepicker.js
         $('#dpfechaExpiracion').datetimepicker({
             format: 'DD/MM/YYYY'

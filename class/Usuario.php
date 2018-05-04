@@ -9,8 +9,10 @@ if (!isset($_SESSION))
     session_start();
 
 if(isset($_POST["action"])){
+    $opt= $_POST["action"];
+    unset($_POST['action']);
     $usuario= new Usuario();
-    switch($_POST["action"]){
+    switch($opt){
         case "ReadAll":
             echo json_encode($usuario->ReadAll());
             break;
@@ -81,7 +83,7 @@ class Usuario{
             $urlarr = explode('/', $_SESSION['usersession']->url);
             $myUrl = end($urlarr);
             foreach ($_SESSION['usersession']->eventos as $evento) {
-                if($myUrl==$evento->url){
+                if(strtolower($myUrl) == strtolower($evento->url)){
                     $_SESSION['usersession']->status= userSessionStatus::login;
                     break;
                 }

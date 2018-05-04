@@ -166,7 +166,7 @@ class Categoria {
         // Recorre arreglo.
         $.each(data, function (i, item) {
             $('#categoria').append(`
-                <option value="${item.id}">${item.nombre}</option>
+                <option value=${item.id}>${item.nombre}</option>
             `);
         })
     };
@@ -213,11 +213,11 @@ class Categoria {
         
         // validator.js
         var validator = new FormValidator({ "events": ['blur', 'input', 'change'] }, document.forms[0]);
-        $('#frmProducto').submit(function (e) {
+        $('#frmCategoria').submit(function (e) {
             e.preventDefault();
             var validatorResult = validator.checkAll(this);
             if (validatorResult.valid)
-                producto.Save;
+                categoria.Save;
             return false;
         });
 

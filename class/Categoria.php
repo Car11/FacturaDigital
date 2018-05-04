@@ -7,8 +7,10 @@ if (!isset($_SESSION))
     session_start();
 
 if(isset($_POST["action"])){
+    $opt= $_POST["action"];
+    unset($_POST['action']);
     $categoria= new Categoria();
-    switch($_POST["action"]){
+    switch($opt){
         case "ReadAll":
             echo json_encode($categoria->ReadAll());
             break;

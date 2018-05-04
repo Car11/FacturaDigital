@@ -62,8 +62,7 @@ class DATA {
                     'code' => 'x01' ,
                     'msg' => 'Error de Ejecución'))
                 );
-            }
-            
+            }            
         } catch (Exception $e) {
             self::$conn->rollback(); 
             header('HTTP/1.0 400 Bad error');

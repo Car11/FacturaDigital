@@ -196,9 +196,9 @@ class Producto{
 
     private function CheckRelatedItems(){
         try{
-            $sql="SELECT id
-                FROM /*  definir relacion */ R
-                WHERE R./*definir campo relacion*/= :id";                
+            $sql="SELECT idproducto
+                FROM categoriasxproducto R
+                WHERE R.idproducto= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -216,12 +216,12 @@ class Producto{
 
     function Delete(){
         try {
-            // if($this->CheckRelatedItems()){
-            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
-            //     $sessiondata['status']=1; 
-            //     $sessiondata['msg']='Registro en uso'; 
-            //     return $sessiondata;           
-            // }                    
+            if($this->CheckRelatedItems()){
+                //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+                $sessiondata['status']=1; 
+                $sessiondata['msg']='Registro en uso'; 
+                return $sessiondata;           
+            }                    
             $sql='DELETE FROM producto  
                 WHERE id= :id';
             $param= array(':id'=>$this->id);

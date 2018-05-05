@@ -77,7 +77,7 @@ class Producto {
                 id: this.id
             }
         })
-            .done(function () {
+            .done(function (e) {
                 swal({
                     //position: 'top-end',
                     type: 'success',

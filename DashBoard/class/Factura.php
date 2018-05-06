@@ -32,7 +32,7 @@ class Factura{
     public $cantidad=0;
 
     function __construct(){
-        require_once("conexion.php");
+        require_once("Conexion.php");
         //require_once("Log.php");
         //require_once('Globals.php');
         //

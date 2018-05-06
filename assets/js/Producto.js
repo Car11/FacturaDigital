@@ -158,14 +158,14 @@ class Producto {
                     <td>${item.cantidad}</td>
                     <td>${item.precio}</td>
                     <td class=" last">
-                        <a href="#" class="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
-                        <a href="#" class="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
+                        <a href="#" id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
+                        <a href="#" id="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
                     </td>
                 </tr>
             `);
             // event Handler
-            $('.update'+item.id).click(producto.UpdateEventHandler);
-            $('.delete'+item.id).click(producto.DeleteEventHandler);
+            $('#update'+item.id).click(producto.UpdateEventHandler);
+            $('#delete'+item.id).click(producto.DeleteEventHandler);
         })
         //datatable         
         if ($.fn.dataTable.isDataTable('#dsProducto')) {

@@ -103,7 +103,7 @@ class Usuario{
 
     function Login(){
         try {            
-            $sql= 'SELECT u.id, u.username, u.nombre, activo, idevento, url
+            $sql= 'SELECT u.id, u.username, u.nombre, activo, idevento, e.nombre as nombreUrl, e.url
                 FROM usuario u inner join rolesxusuario ru on ru.idusuario = u.id
                     inner join eventosxrol er on er.idrol = ru.idrol
                     inner join evento e on e.id = er.idevento
@@ -123,11 +123,13 @@ class Usuario{
                         $this->url = isset($_SESSION['usersession']->url)? $_SESSION['usersession']->url : 'Dashboard.html'; // Url consultada
                         //
                         $evento->id= $value['idevento'];
+                        $evento->nombre= $value['nombreUrl'];
                         $evento->url= $value['url'];
                         $this->eventos = array($evento);
                     }
                     else {
                         $evento->id= $value['idevento'];
+                        $evento->nombre= $value['nombreUrl'];
                         $evento->url= $value['url'];
                         array_push ($this->eventos, $evento);
                     }

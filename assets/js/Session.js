@@ -19,11 +19,13 @@ var Session=  {
                 case 'login':
                     $('.right_col').show();
                     Session.setUsername(data.username, data.nombre);
+                    Session.setMenu(data.eventos);  
                     Session.state=true;
                     break;
                 case 'nocredencial':
                     $('.right_col').hide();
                     Session.setUsername(data.username, data.nombre);      
+                    Session.setMenu(data.eventos);    
                     Session.state=false;
                     swal({
                         //position: 'top-end',
@@ -50,6 +52,15 @@ var Session=  {
             '<span class=" fa fa-angle-down" ></span> '        
         );
         $('#call_name').text(n);
+    },
+    setMenu(eventos){
+        $.each(eventos, function (i, item) {
+            $('#call_menu').append(`
+                <li>
+                    <a href="${item.url}">${item.nombre}</a>
+                </li>
+            `);
+        });
     },  
     End(){
         $.ajax({
@@ -68,11 +79,3 @@ var Session=  {
         });
     }
 }
-
-
-
-
-
-
-
-

@@ -33,14 +33,8 @@ if(isset($_POST["action"])){
 class Producto{
     public $id=null;
     public $nombre='';
-    public $nombreAbreviado='';
-    public $descripcion='';    
-    public $cantidad=0;
-    public $precio=0;
-    public $scancode='';
-    public $codigoRapido='';
-    public $fechaExpiracion=null;
-    public $listacategoria= array();
+    public $descripcion='';
+    public $listaevento= array();
     
 
     function __construct(){
@@ -53,22 +47,16 @@ class Producto{
             require_once("UUID.php");
             $this->id= $obj["id"] ?? UUID::v4();
             $this->nombre= $obj["nombre"] ?? '';
-            $this->nombreAbreviado= $obj["nombreAbreviado"] ?? '';
             $this->descripcion= $obj["descripcion"] ?? '';
-            $this->cantidad= $obj["cantidad"] ?? 0;            
-            $this->precio= $obj["precio"] ?? 0;
-            $this->scancode= $obj["scancode"] ?? '';            
-            $this->codigoRapido= $obj["codigoRapido"] ?? 0;            
-            $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
             //Categorias del producto.
-            if(isset($obj["listacategoria"] )){
+            if(isset($obj["listaevento"] )){
                 require_once("CategoriasxProducto.php");
                 //
-                foreach ($obj["listacategoria"] as $idcat) {
+                foreach ($obj["listaevento"] as $idcat) {
                     $catprod= new CategoriasXProducto();
                     $catprod->idcategoria= $idcat;
                     $catprod->idproducto= $this->id;
-                    array_push ($this->listacategoria, $catprod);
+                    array_push ($this->listaevento, $catprod);
                 }
             }
         }
@@ -76,7 +64,7 @@ class Producto{
 
     function ReadAll(){
         try {
-            $sql='SELECT id, nombre, nombreAbreviado, scancode, cantidad, precio , codigoRapido
+            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigoRapido
                 FROM     producto       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
@@ -116,13 +104,13 @@ class Producto{
                     if($value['idcategoria']!=null){
                         $cat->id = $value['idcategoria'];
                         $cat->nombre = $value['nombrecategoria'];
-                        array_push ($this->listacategoria, $cat);
+                        array_push ($this->listaevento, $cat);
                     }
                 }
                 else {
                     $cat->id = $value['idcategoria'];
                     $cat->nombre = $value['nombrecategoria'];
-                    array_push ($this->listacategoria, $cat);
+                    array_push ($this->listaevento, $cat);
                 }
             }
             return $this;
@@ -147,7 +135,7 @@ class Producto{
             if($data)
             {
                 //save array obj
-                if(CategoriasxProducto::Create($this->listacategoria))
+                if(CategoriasxProducto::Create($this->listaevento))
                     return true;
                 else throw new Exception('Error al guardar las categorias.', 03);
             }
@@ -172,8 +160,8 @@ class Producto{
             $data = DATA::Ejecutar($sql,$param,false);
             if($data){
                 //update array obj
-                if($this->listacategoria!=null)
-                    if(CategoriasxProducto::Update($this->listacategoria))
+                if($this->listaevento!=null)
+                    if(CategoriasxProducto::Update($this->listaevento))
                         return true;            
                     else throw new Exception('Error al guardar las categorias.', 03);
                 else {

@@ -6,7 +6,7 @@
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/Session.js"></script>
     <script>
-        //Session.Check();
+        Session.Check();
     </script>
     <!-- /End check -->
 
@@ -16,7 +16,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>FAC-CR | Productos</title>
+    <title>FAC-CR | Nuevo Usuario</title>
 
     <!-- Bootstrap -->
     <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -30,6 +30,8 @@
     <link href="assets/css/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="assets/css/custom.css" rel="stylesheet">
+    <!-- Switchery -->
+    <link href="assets/css/switchery/switchery.min.css" rel="stylesheet">
 
 </head>
 
@@ -146,31 +148,7 @@
                             <div class="x_panel">
                                 <div class="x_title">
                                     <h2>Nuevo Usuario</h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li>
-                                            <a class="collapse-link">
-                                                <i class="fa fa-chevron-up"></i>
-                                            </a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                <i class="fa fa-wrench"></i>
-                                            </a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li>
-                                                    <a href="#">Settings 1</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <a class="close-link">
-                                                <i class="fa fa-close"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
+                                    
                                     <div class="clearfix"></div>
                                 </div>
                                 <!--  CONTENIDO DE LA PAGINA -->
@@ -178,36 +156,62 @@
                                 <div class="x_content">
                                     <form class="form-horizontal form-label-left" id="frmProducto" method="POST" novalidate>
 
-                                        <span class="section">Datos Generales</span>
+                                        <!-- <span class="section">Datos Generales</span> -->
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nombre">Nombre / eMail
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nombre">Nombre Completo
                                                 <span class="required">*</span>
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre completo Del usuario"
-                                                    autofocus>
+                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre completo Del usuario">
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="scancode">Password</label>
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">Username
+                                                <span class="required">*</span>
+                                            </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="scancode" class="form-control col-md-7 col-xs-12" name="scancode" type="text" placeholder="Código de barras">
+                                                <input id="username" class="form-control col-md-7 col-xs-12" name="username" required="required" type="text" >
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="codigoRapido">Activar </label>
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password
+                                                <span class="required">*</span>
+                                            </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="codigoRapido" class="form-control col-md-7 col-xs-12" name="codigoRapido" type="text" placeholder="Definido por el usuario">
+                                                <input id="password" class="form-control col-md-7 col-xs-12" name="password" required="required" type="text" >
+                                            </div>
+                                        </div>
+
+                                        <div class="item form-group">
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="repetir">Repetir Password</label>
+                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <input id="repetir" class="form-control col-md-7 col-xs-12" name="repetir" type="text" placeholder="Repita el password">
+                                            </div>
+                                        </div>
+
+                                        <div class="item form-group">
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email</label>
+                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <input id="email" class="form-control col-md-7 col-xs-12" name="email" type="text">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Activo</label>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <label>
+                                                  <input type="checkbox" class="js-switch" checked="" data-switchery="true" style="display: none;">
+                                                </label>
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Roles (Multiple)</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <select class="select2_multiple form-control" multiple="multiple" id="categoria" name="categoria"></select>
+                                                <select class="select2_multiple form-control" multiple="multiple" id="rol" name="rol"></select>
                                             </div>
                                         </div>
                                         
@@ -261,6 +265,8 @@
     <script src="assets/js/Producto.js"></script>
     <!-- Sweet Alert -->
     <script src="assets/js/sweetalert2.min.js"></script>
+    <!-- Switchery -->
+    <script src="assets/js/switchery/switchery.min.js"></script>
 
 </body>
 

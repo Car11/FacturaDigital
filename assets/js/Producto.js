@@ -78,13 +78,31 @@ class Producto {
             }
         })
             .done(function (e) {
-                swal({
-                    //position: 'top-end',
-                    type: 'success',
-                    title: 'Eliminado!',
-                    showConfirmButton: false,
-                    timer: 1000
-                });
+                var data = JSON.parse(e);
+                if(data.status==0)
+                    swal({
+                        //position: 'top-end',
+                        type: 'success',
+                        title: 'Eliminado!',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                else if(data.status==1){
+                    swal({
+                        type: 'Warning',
+                        title: 'Registro Relacionado...',
+                        text: 'El registro que intenta eliminar tiene objetos relacionados',
+                        footer: '<a href>Contacte a Soporte Técnico</a>',
+                    });
+                }
+                else {
+                    swal({
+                        type: 'Error',
+                        title: 'Ha ocurrido un error...',
+                        text: 'El registro no ha sido eliminado',
+                        footer: '<a href>Contacte a Soporte Técnico</a>',
+                    })
+                }
             })
             .fail(function (e) {
                 producto.showError(e);
@@ -158,8 +176,8 @@ class Producto {
                     <td>${item.cantidad}</td>
                     <td>${item.precio}</td>
                     <td class=" last">
-                        <a href="#" id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
-                        <a href="#" id="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
+                        <a id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
+                        <a id="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
                     </td>
                 </tr>
             `);

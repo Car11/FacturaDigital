@@ -49,6 +49,8 @@ abstract class userSessionStatus
     const invalido = 'invalido'; // login invalido
     const login = 'login'; // login ok; credencial ok
     const nocredencial= 'nocredencial'; // login ok; sin credenciales
+    const inactivo= 'inactivo';
+    const noexiste= 'noexiste';
 }
 
 class Usuario{
@@ -101,45 +103,66 @@ class Usuario{
         //return true;
     }
 
+    function CreateHash(){
+        return password_hash($this->password, PASSWORD_DEFAULT);
+    }
+
     function Login(){
-        try {            
-            $sql= 'SELECT u.id, u.username, u.nombre, activo, idevento, e.nombre as nombreUrl, e.url
-                FROM usuario u inner join rolesxusuario ru on ru.idusuario = u.id
-                    inner join eventosxrol er on er.idrol = ru.idrol
-                    inner join evento e on e.id = er.idevento
-                    where password=:password  AND username=:username';
-            $param= array(':username'=>$this->username, ':password'=>$this->password);   
+        try { 
+            // demo; borrar...........<<<<
+            //$this->password= $this->CreateHash();
+            //..................>>>>
+            //Check activo & password.
+            $sql= 'SELECT u.id, u.username, u.nombre, activo, password, idevento, e.nombre as nombreUrl, e.url
+            FROM usuario u inner join rolesxusuario ru on ru.idusuario = u.id
+                inner join eventosxrol er on er.idrol = ru.idrol
+                inner join evento e on e.id = er.idevento
+                where username=:username';
+            $param= array(':username'=>$this->username);
             $data= DATA::Ejecutar($sql, $param);
             if($data){
-                foreach ($data as $key => $value){
-                    // Session
-                    $evento= new Evento(); // evento con credencial del usuario.
-                    if($key==0){
-                        $this->id = $value['id'];
-                        $this->username = $value['username'];
-                        $this->nombre = $value['nombre'];
-                        $this->activo = $value['activo'];
-                        $this->status = userSessionStatus::login;
-                        $this->url = isset($_SESSION['usersession']->url)? $_SESSION['usersession']->url : 'Dashboard.html'; // Url consultada
-                        //
-                        $evento->id= $value['idevento'];
-                        $evento->nombre= $value['nombreUrl'];
-                        $evento->url= $value['url'];
-                        $this->eventos = array($evento);
+                if($data[0]['activo']==0){
+                    unset($_SESSION["usersession"]);
+                    $this->status= userSessionStatus::inactivo;
+                }
+                else {
+                    // usuario activo; check password
+                    if(password_verify($this->password, $data[0]['password'])){
+                        foreach ($data as $key => $value){
+                            // Session
+                            $evento= new Evento(); // evento con credencial del usuario.
+                            if($key==0){
+                                $this->id = $value['id'];
+                                $this->username = $value['username'];
+                                $this->nombre = $value['nombre'];
+                                $this->activo = $value['activo'];
+                                $this->status = userSessionStatus::login;
+                                $this->url = isset($_SESSION['usersession']->url)? $_SESSION['usersession']->url : 'Dashboard.html'; // Url consultada
+                                //
+                                $evento->id= $value['idevento'];
+                                $evento->nombre= $value['nombreUrl'];
+                                $evento->url= $value['url'];
+                                $this->eventos = array($evento);
+                            }
+                            else {
+                                $evento->id= $value['idevento'];
+                                $evento->nombre= $value['nombreUrl'];
+                                $evento->url= $value['url'];
+                                array_push ($this->eventos, $evento);
+                            }                    
+                        }
                     }
-                    else {
-                        $evento->id= $value['idevento'];
-                        $evento->nombre= $value['nombreUrl'];
-                        $evento->url= $value['url'];
-                        array_push ($this->eventos, $evento);
+                    else { // password invalido
+                        unset($_SESSION["usersession"]);
+                        $this->status= userSessionStatus::invalido;
                     }
-                    
-                }                
+                }
             }
             else {
                 unset($_SESSION["usersession"]);
-                $this->status= userSessionStatus::invalido;
+                $this->status= userSessionStatus::noexiste;
             }
+            // set user session.
             $_SESSION["usersession"]= $this;
         }     
         catch(Exception $e) {
@@ -151,7 +174,29 @@ class Usuario{
             );
         } 
     }
+
+    function setUnsafeCookie($name, $cookieData, $key)
+    {
+        
+        $iv = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+        return setcookie(
+            $name, 
+            base64_encode(
+                $iv.
+                mcrypt_encrypt(
+                    MCRYPT_RIJNDAEL_128,
+                    $key,
+                    json_encode($cookieData),
+                    MCRYPT_MODE_CBC,
+                    $iv
+                )
+            )
+        );
+    }
+
 }
+
+
 
 
 ?>

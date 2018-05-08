@@ -25,7 +25,7 @@ if(isset($_POST["action"])){
             $producto->Update();
             break;
         case "Delete":
-            $producto->Delete();
+            echo json_encode($producto->Delete());
             break;   
     }    
 }

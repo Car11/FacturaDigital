@@ -34,7 +34,25 @@ function Login(){
             if(data.url)
                 location.href= data.url || 'Dashboard.html';
         }
-        else 
+        else if(data.status=='inactivo')
+            $("#error").fadeIn(500, function(){
+                $("#error").html(`                    
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        Usuario <strong>INACTIVO</strong>.
+                    </div>
+                `);
+            });  
+        else if(data.status=='noexiste')
+            $("#error").fadeIn(500, function(){
+                $("#error").html(`                    
+                    <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        Usuario <strong>NO EXISTE</strong>, favor registrarse.
+                    </div>
+                `);
+            });  
+        else
             $("#error").fadeIn(500, function(){      
                 $("#error").html(`                    
                     <div class="alert alert-danger alert-dismissible fade in" role="alert">

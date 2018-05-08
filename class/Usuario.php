@@ -34,7 +34,7 @@ if(isset($_POST["action"])){
             $usuario->Login();
             echo json_encode($_SESSION['usersession']);
             break;   
-        case "CheckSession":            
+        case "CheckSession":
             $usuario->CheckSession();
             echo json_encode($_SESSION['usersession']);
             break;
@@ -60,8 +60,8 @@ class Usuario{
     public $nombre;
     public $email;
     public $activo = 0;
-    public $status = userSessionStatus::invalido;
-    public $eventos= array(); // array de eventos del usuario.
+    public $status = userSessionStatus::invalido; // estado de la sesion de usuario.
+    public $roles= array(); // array de eventos del usuario.
     public $url;    
 
     function __construct(){
@@ -71,11 +71,28 @@ class Usuario{
         }
         if(isset($_POST["obj"])){
             $obj= json_decode($_POST["obj"],true);
-            $this->id= $obj["id"] ?? null;
-            $this->id= $obj["username"] ?? '';
-            $this->nombre= $obj["nombre"] ?? '';            
+            require_once("UUID.php");
+            $this->id= $obj["id"] ?? UUID::v4();
+            $this->nombre= $obj["nombre"] ?? '';  
+            $this->username= $obj["username"] ?? '';
+            $this->password= $obj["password"] ?? '';  
+            $this->email= $obj["email"] ?? '';  
+            $this->activo= $obj["activo"] ?? '';  
+            //roles del usuario.
+            if(isset($obj["listarol"] )){
+                require_once("RolesXUsuario.php");
+                //
+                foreach ($obj["listarol"] as $idrol) {
+                    $rolUsr= new RolesXUsuario();
+                    $rolUsr->idrol= $idrol;
+                    $rolUsr->idusr= $this->id;
+                    array_push ($this->listarol, $rolUsr);
+                }
+            }
         }
     }
+
+    // login and user session
 
     function CheckSession(){
         if(isset($_SESSION["usersession"]->id)){
@@ -175,23 +192,166 @@ class Usuario{
         } 
     }
 
-    function setUnsafeCookie($name, $cookieData, $key)
-    {
-        
-        $iv = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
-        return setcookie(
-            $name, 
-            base64_encode(
-                $iv.
-                mcrypt_encrypt(
-                    MCRYPT_RIJNDAEL_128,
-                    $key,
-                    json_encode($cookieData),
-                    MCRYPT_MODE_CBC,
-                    $iv
-                )
-            )
-        );
+    // usuario CRUD
+
+    function ReadAll(){
+        try {
+            $sql='SELECT id, nombre, username, email, activo
+                FROM     usuario       
+                ORDER BY nombre asc';
+            $data= DATA::Ejecutar($sql);
+            return $data;
+        }     
+        catch(Exception $e) {
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => 'Error al cargar la lista'))
+            );
+        }
+    }
+
+    function Read(){
+        try {
+            $sql='SELECT p.id, p.nombre, p.username, p.password, email, activo, idrol, rol
+                FROM usuario  p LEFT JOIN rolesxusuario cp on cp.idusuario = p.id
+                    LEFT JOIN rol c on c.id = cp.idrol
+                where p.id=:id';
+            $param= array(':id'=>$this->id);
+            $data= DATA::Ejecutar($sql,$param);     
+            foreach ($data as $key => $value){
+                require_once("Rol.php");
+                $rol= new rol(); // crol del producto
+                if($key==0){
+                    $this->id = $value['id'];
+                    $this->nombre = $value['nombre'];
+                    $this->username = $value['username'];
+                    $this->password = $value['password'];
+                    $this->email = $value['email'];
+                    $this->activo = $value['activo'];
+                    //rol
+                    if($value['idrol']!=null){
+                        $rol->id = $value['idrol'];
+                        $rol->nombre = $value['rol'];
+                        array_push ($this->listarol, $rol);
+                    }
+                }
+                else {
+                    $rol->id = $value['idrol'];
+                    $rol->nombre = $value['rol'];
+                    array_push ($this->listarol, $rol);
+                }
+            }
+            return $this;
+        }     
+        catch(Exception $e) {
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => 'Error al cargar el usuairo'))
+            );
+        }
+    }
+
+    function Create(){
+        try {
+            $sql="INSERT INTO usuairo   (id, nombre, username, password, email, activo)
+                VALUES (:uuid, :nombre, :username, :password, :email, :activo, :scancode, :codigoRapido, :fechaExpiracion)";
+            //
+            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=>$this->password, ':email'=>$this->email, ':activo'=>$this->activo);
+            $data = DATA::Ejecutar($sql,$param, false);
+            if($data)
+            {
+                //save array obj
+                if(RolesXUsuario::Create($this->listaroles))
+                    return true;
+                else throw new Exception('Error al guardar los roles.', 03);
+            }
+            else throw new Exception('Error al guardar.', 02);
+        }     
+        catch(Exception $e) {
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
+    }
+
+    function Update(){
+        try {
+            $sql="UPDATE usuairo 
+                SET nombre=:nombre, username=:username, password= :password, email=:email, activo=:activo 
+                WHERE id=:id";
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=>$this->password, ':email'=>$this->email, ':activo'=>$this->activo);
+            $data = DATA::Ejecutar($sql,$param,false);
+            if($data){
+                //update array obj
+                if($this->listacategoria!=null)
+                    if(RolesXUsuario::Update($this->listarol))
+                        return true;            
+                    else throw new Exception('Error al guardar los roles.', 03);
+                else {
+                    // no tiene roles
+                    if(RolesXUsuario::Delete($this->id))
+                        return true;
+                    else throw new Exception('Error al guardar los roles.', 04);
+                }
+            }
+            else throw new Exception('Error al guardar.', 123);
+        }     
+        catch(Exception $e) {
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
+    }   
+
+    private function CheckRelatedItems(){
+        try{
+            $sql="SELECT xx
+                FROM xx R
+                WHERE R.xx= :id";
+            $param= array(':id'=>$this->id);
+            $data= DATA::Ejecutar($sql, $param);
+            if(count($data))
+                return true;
+            else return false;
+        }
+        catch(Exception $e){
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
+    }
+
+    function Delete(){
+        try {
+            if($this->CheckRelatedItems()){
+                //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+                $sessiondata['status']=1; 
+                $sessiondata['msg']='Registro en uso'; 
+                return $sessiondata;           
+            }                    
+            $sql='DELETE FROM usuario  
+                WHERE id= :id';
+            $param= array(':id'=>$this->id);
+            $data= DATA::Ejecutar($sql, $param, false);
+            if($data)
+                return $sessiondata['status']=0; 
+            else throw new Exception('Error al eliminar.', 978);
+        }
+        catch(Exception $e) {
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
     }
 
 }

@@ -137,7 +137,7 @@
                 <div class="">
                     <div class="page-title">
                         <div class="title_left">
-                            <h3>USUARIOS</h3>
+                            <h3>ROLES</h3>
                         </div>                        
                     </div>
 
@@ -147,7 +147,7 @@
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Nuevo Usuario</h2>
+                                    <h2>Nuevo Rol</h2>
                                     
                                     <div class="clearfix"></div>
                                 </div>
@@ -156,55 +156,29 @@
                                 <div class="x_content">
                                     <form class="form-horizontal form-label-left" id="frmProducto" method="POST" novalidate>
 
-                                        <span class="section">Datos Generales</span>
+                                        <!-- <span class="section">Datos Generales</span> -->
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nombre">Nombre Completo
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nombre">Nombre
                                                 <span class="required">*</span>
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre completo Del usuario">
+                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre del Rol">
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">Username
-                                                <span class="required">*</span>
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="descripcion">Descripción
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="username" class="form-control col-md-7 col-xs-12" name="username" required="required" type="text" >
+                                                <input id="descripcion" class="form-control col-md-7 col-xs-12" name="descripcion" type="text" >
                                             </div>
-                                        </div>
+                                        </div>                                       
 
                                         <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password
-                                                <span class="required">*</span>
-                                            </label>
+                                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Eventos (Multiple)</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="password" class="form-control col-md-7 col-xs-12" name="password" required="required" type="text" >
-                                            </div>
-                                        </div>
-
-                                        <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="repetir">Repetir Password</label>
-                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="repetir" class="form-control col-md-7 col-xs-12" name="repetir" type="text" placeholder="Repita el password">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Activo</label>
-                                            <div class="col-md-9 col-sm-9 col-xs-12">
-                                                <label>
-                                                  <input type="checkbox" class="js-switch" checked="" data-switchery="true" style="display: none;">
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="item form-group">
-                                            <label class="control-label col-md-3 col-sm-3 col-xs-12">Roles (Multiple)</label>
-                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <select class="select2_multiple form-control" multiple="multiple" id="rol" name="rol"></select>
+                                                <select class="select2_multiple form-control" multiple="multiple" id="evento" name="evento"></select>
                                             </div>
                                         </div>
                                         

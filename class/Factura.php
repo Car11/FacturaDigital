@@ -32,7 +32,7 @@ class Factura{
     public $cantidad=0;
 
     function __construct(){
-        require_once("Conexion.php");
+        require_once("conexion.php");
         //require_once("Log.php");
         //require_once('Globals.php');
         //
@@ -52,7 +52,7 @@ class Factura{
 
     function LoadProducto(){
         try {
-            $sql="SELECT id, cantidad, precio, codigorapido, descripcion FROM producto WHERE codigorapido =:codigorapido OR scancode = :codigorapido";
+            $sql="SELECT id, cantidad, precio, codigorapido, descripcion FROM producto WHERE codigorapido =:codigorapido";
             $param= array(':codigorapido'=>$this->codigo);
             $data= DATA::Ejecutar($sql,$param);
             return $data;

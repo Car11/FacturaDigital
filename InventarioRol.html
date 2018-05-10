@@ -24,12 +24,12 @@
     <link href="assets/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="assets/css/nprogress/nprogress.css" rel="stylesheet">
-    <!-- bootstrap-datetimepicker -->
-    <link href="assets/css/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">
     <!-- iCheck -->
     <link href="assets/css/iCheck/skins/flat/green.css" rel="stylesheet">
     <!-- SweetAlert -->
     <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
+    <!-- Select -->
+    <link href="assets/css/bootstrap-select.css" rel="stylesheet">
 
     <!-- Datatables -->
     <link href="../vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
@@ -178,7 +178,7 @@
                                     <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table id="dsProducto" class="table table-striped table-bordered dataTable no-footer jambo_table " role="grid" aria-describedby="datatable_info">
+                                                <table id="dsRol" class="table table-striped table-bordered dataTable no-footer jambo_table " role="grid" aria-describedby="datatable_info">
                                                     <thead>
                                                         <tr role="row" class="headings">
                                                         </tr>
@@ -206,7 +206,7 @@
                                                 </div>
 
                                                 <div class="modal-body">
-                                                    <form class="form-horizontal form-label-left" id="frmProducto" method="POST" novalidate>
+                                                    <form class="form-horizontal form-label-left" id="frmRol" method="POST" novalidate>
 
                                                         <span class="section">Datos Generales</span>
 
@@ -230,7 +230,7 @@
                                                         <div class="item form-group">
                                                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Eventos (Multiple)</label>
                                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                                <select class="select2_multiple form-control" multiple="multiple" id="evento" name="evento"></select>
+                                                                <select class="selectpicker show-menu-arrow form-control" multiple="multiple" id="evento" name="evento"></select>
                                                             </div>
                                                         </div>
 
@@ -293,31 +293,16 @@
     <!-- Input mask -->
     <script src="assets/js/jquery.inputmask/jquery.inputmask.bundle.min.js"></script>
     <!-- JS Scripts -->
-    <script src="assets/js/Inventario.js"></script>
-    <script src="assets/js/Producto.js"></script>
-    <script src="assets/js/Categoria.js"></script>
+    <script src="assets/js/Rol.js"></script>
+    <script src="assets/js/Evento.js"></script>
     <!-- Sweet Alert -->
     <script src="assets/js/sweetalert2.min.js"></script>
-
     <!-- Datatables -->
     <script src="../vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-    <!--<script src="../vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    <script src="../vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-    <script src="../vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-    <script src="../vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
-    <script src="../vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
-    <script src="../vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-    <script src="../vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-    <script src="../vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-    <script src="../vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-    <script src="../vendors/jszip/dist/jszip.min.js"></script>
-    <script src="../vendors/pdfmake/build/pdfmake.min.js"></script>
-    <script src="../vendors/pdfmake/build/vfs_fonts.js"></script> -->
-
     <!-- Custom Theme Scripts -->
     <script src="assets/js/custom.min.js"></script>
+    <!-- Select -->
+    <script src="assets/js/bootstrap-select.js"></script>
 
 </body>
 
@@ -325,14 +310,11 @@
 
 <script>
     $(document).ready(function () {
-        Session.Check();
-        //if(!Session.state)
-        //  return;
-        producto.id = null;
-        producto.Read;
-        producto.Init();
+        rol.id = null;
+        rol.Read;
+        rol.Init();
         //
-        categoria.List;
+        evento.List;
     });
 
 </script>

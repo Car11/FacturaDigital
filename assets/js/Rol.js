@@ -1,63 +1,57 @@
-class Usuario {
+class Rol {
     // Constructor
-    constructor(id, nombre, username, password, email, activo, r) {
+    constructor(id, nombre, descripcion, evento) {
         this.id = id || null;
         this.nombre = nombre || '';
-        this.username = username || '';
-        this.password = password || '';
-        this.email = email || '';
-        this.activo = activo || 0; //1: activo; 0: inactivo.
-        this.listarol = r || null;
+        this.descripcion = descripcion || '';
+        this.listaevento = evento || null;
     }
 
     //Getter
     get Read() {
-        var miAccion = this.id == null ? 'ReadAll' : 'Read';
-        if (miAccion == 'ReadAll' && $('#tableBody-Usuario').length == 0)
+        var miAccion = this.id == null ?  'ReadAll'  : 'Read';
+        if(miAccion=='ReadAll' && $('#tableBody-Rol').length==0 )
             return;
         $.ajax({
             type: "POST",
-            url: "class/Usuario.php",
+            url: "class/Rol.php",
             data: {
                 action: miAccion,
                 id: this.id
             }
         })
             .done(function (e) {
-                usuario.Reload(e);
+                rol.Reload(e);
             })
             .fail(function (e) {
-                usuario.showError(e);
+                rol.showError(e);
             });
     }
 
     get Save() {
-        // this.CheckUsername();
-        $('#btnUsuario').attr("disabled", "disabled");
+        $('#btnRol').attr("disabled", "disabled");
         var miAccion = this.id == null ? 'Create' : 'Update';
         this.nombre = $("#nombre").val();
-        this.username = $("#username").val();
-        this.password = $("#password").val();
-        this.email = $("#email").val();
-        this.activo = $("#activo").val() == 'on' ? 1 : 0;
-        this.listarol = $('#rol > option:selected').map(function () { return this.value; }).get();
+        this.descripcion = $("#descripcion").val();
+        // Lista de eventos seleccionados.
+        this.listaevento = $('#evento > option:selected').map(function () { return this.value; }).get();
         $.ajax({
             type: "POST",
-            url: "class/Usuario.php",
+            url: "class/Rol.php",
             data: {
                 action: miAccion,
                 obj: JSON.stringify(this)
             }
         })
-            .done(usuario.showInfo)
+            .done(rol.showInfo)
             .fail(function (e) {
-                usuario.showError(e);
+                rol.showError(e);
             })
             .always(function () {
-                setTimeout('$("#btnUsuario").removeAttr("disabled")', 1000);
-                usuario = new Usuario();
-                usuario.ClearCtls();
-                usuario.Read;
+                setTimeout('$("#btnRol").removeAttr("disabled")', 1000);
+                rol = new Rol();
+                rol.ClearCtls();
+                rol.Read;
                 $("#nombre").focus();
             });
     }
@@ -65,7 +59,7 @@ class Usuario {
     get Delete() {
         $.ajax({
             type: "POST",
-            url: "class/Usuario.php",
+            url: "class/Rol.php",
             data: {
                 action: 'Delete',
                 id: this.id
@@ -73,7 +67,7 @@ class Usuario {
         })
             .done(function (e) {
                 var data = JSON.parse(e);
-                if (data.status == 0)
+                if(data.status==0)
                     swal({
                         //position: 'top-end',
                         type: 'success',
@@ -81,7 +75,7 @@ class Usuario {
                         showConfirmButton: false,
                         timer: 1000
                     });
-                else if (data.status == 1) {
+                else if(data.status==1){
                     swal({
                         type: 'Warning',
                         title: 'Registro Relacionado...',
@@ -99,12 +93,32 @@ class Usuario {
                 }
             })
             .fail(function (e) {
-                usuario.showError(e);
+                rol.showError(e);
             })
             .always(function () {
-                usuario = new Usuario();
-                usuario.Read;
+                rol = new Rol();
+                rol.Read;
             });
+    }
+
+    get List() {
+        var miAccion= 'ReadAll';
+        $.ajax({
+            type: "POST",
+            url: "class/Rol.php",
+            data: { 
+                action: miAccion
+            }
+        })
+        .done(function( e ) {
+            rol.ShowList(e);
+        })    
+        .fail(function (e) {
+            rol.showError(e);
+        })
+        .always(function (e){
+            $("#rol").selectpicker("refresh");
+        });
     }
 
     // Methods
@@ -142,35 +156,26 @@ class Usuario {
     ClearCtls() {
         $("#id").val('');
         $("#nombre").val('');
-        $("#username").val('');
-        $("#password").val('');
-        $("#repetir").val('');
-        $("#email").val('');
-        $("#activo").val('');
-        $('#rol option').prop("selected", false);
-        $("#rol").selectpicker("refresh");
-        $('#checkusername').removeClass('fa-check-circle');
-        $('#checkusername').removeClass('fa-times-circle');
-        $('#checkusername').text('');
+        $("#descripcion").val('');
+        $('#evento option').prop("selected", false);
+        $("#evento").selectpicker("refresh");
     };
 
     ShowAll(e) {
         // Limpia el div que contiene la tabla.
-        $('#tableBody-Usuario').html("");
-        // // Carga lista
+        $('#tableBody-Rol').html("");
+        // Carga lista
         var data = JSON.parse(e);
-        //style="display: none"
+        //
         $.each(data, function (i, item) {
-            $('#tableBody-Usuario').append(`
+            $('#tableBody-Rol').append(`
                 <tr> 
                     <td class="a-center ">
                         <input type="checkbox" class="flat" name="table_records">
                     </td>
                     <td class="itemId" >${item.id}</td>
                     <td>${item.nombre}</td>
-                    <td>${item.username}</td>
-                    <td>${item.email}</td>
-                    <td>${item.activo}</td>
+                    <td>${item.descripcion}</td>
                     <td class=" last">
                         <a id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
                         <a id="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
@@ -178,15 +183,15 @@ class Usuario {
                 </tr>
             `);
             // event Handler
-            $('#update' + item.id).click(usuario.UpdateEventHandler);
-            $('#delete' + item.id).click(usuario.DeleteEventHandler);
+            $('#update'+item.id).click(rol.UpdateEventHandler);
+            $('#delete'+item.id).click(rol.DeleteEventHandler);
         })
         //datatable         
-        if ($.fn.dataTable.isDataTable('#dsUsuario')) {
-            var table = $('#dsUsuario').DataTable();
+        if ($.fn.dataTable.isDataTable('#dsRol')) {
+            var table = $('#dsRol').DataTable();
         }
         else
-            $('#dsUsuario').DataTable({
+            $('#dsRol').DataTable({
                 columns: [
                     { title: "Check" },
                     {
@@ -194,9 +199,7 @@ class Usuario {
                         //,visible: false
                     },
                     { title: "Nombre" },
-                    { title: "Username" },
-                    { title: "eMail" },
-                    { title: "Activo" },
+                    { title: "Descripcion" },
                     { title: "Action" }
                 ],
                 paging: true,
@@ -205,8 +208,8 @@ class Usuario {
     };
 
     UpdateEventHandler() {
-        usuario.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
-        usuario.Read;
+        rol.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+        rol.Read;
     };
 
     ShowItemData(e) {
@@ -214,23 +217,31 @@ class Usuario {
         this.ClearCtls();
         // carga objeto.
         var data = JSON.parse(e);
-        usuario = new Usuario(data.id, data.nombre, data.username, data.password, data.email, data.activo, data.listarol);
+        rol = new Rol(data.id, data.nombre, data.descripcion, data.listaevento);
         // Asigna objeto a controles
-        $("#id").val(usuario.id);
-        $("#nombre").val(usuario.nombre);
-        $("#username").val(usuario.username);
-        $("#password").val(usuario.password);
-        $("#activo").val(usuario.activo);
-        $("#email").val(usuario.email);
-        //roles 
-        $.each(usuario.listarol, function (i, item) {
-            $('#rol option[value=' + item.id + ']').prop("selected", true);
+        $("#id").val(rol.id);
+        $("#nombre").val(rol.nombre);
+        $("#descripcion").val(rol.descripcion);
+        // eventos.
+        $.each(rol.listaevento, function(i, item){
+            $('#evento option[value=' + item.id + ']').prop("selected", true);
         });
-        $("#rol").selectpicker("refresh");
+        $("#evento").selectpicker("refresh");
+    };
+
+    ShowList(e) {
+        // carga lista con datos.
+        var data = JSON.parse(e);
+        // Recorre arreglo.
+        $.each(data, function (i, item) {
+            $('#rol').append(`
+                <option value=${item.id}>${item.nombre}</option>
+            `);
+        })
     };
 
     DeleteEventHandler() {
-        usuario.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+        rol.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
         // Mensaje de borrado:
         swal({
             title: 'Eliminar?',
@@ -245,54 +256,19 @@ class Usuario {
             cancelButtonClass: 'btn btn-danger'
         }).then((result) => {
             if (result.value) {
-                usuario.Delete;
+                rol.Delete;
             }
         })
     };
 
-    CheckUsername() {
-        if ($('#username').val() == "")
-            return;
-        $('#btnUsuario').attr("disabled", "disabled");
-        var miAccion = 'CheckUsername';
-        this.username = $("#username").val();
-        $.ajax({
-            type: "POST",
-            url: "class/Usuario.php",
-            data: {
-                action: miAccion,
-                username: this.username
-            }
-        })
-            .done(function (e) {
-                var data = JSON.parse(e);
-                if (data.status == 0) {//0= unico; 1= usado.
-                    $('#checkusername').removeClass('fa-times-circle');
-                    $('#checkusername').addClass('fa-check-circle');
-                    $("#btnUsuario").removeAttr("disabled");
-                    $('#checkusername').text(' Nombre de usuario único.');
-                }
-                else {
-                    $('#checkusername').removeClass('fa-check-circle');
-                    $('#checkusername').addClass('fa-times-circle');
-                    $('#checkusername').text(' Nombre de usuario repetido.');
-                }
-
-            })
-            .fail(function (e) {
-                usuario.showError(e);
-            });
-
-    }
-
     Init() {
         // validator.js
         var validator = new FormValidator({ "events": ['blur', 'input', 'change'] }, document.forms[0]);
-        $('#frmUsuario').submit(function (e) {
+        $('#frmRol').submit(function (e) {
             e.preventDefault();
             var validatorResult = validator.checkAll(this);
             if (validatorResult.valid)
-                usuario.Save;
+                rol.Save;
             return false;
         });
 
@@ -300,13 +276,8 @@ class Usuario {
         document.forms[0].onreset = function (e) {
             validator.reset();
         }
-
-        // Check username
-        $('#username').focusout(function () {
-            usuario.CheckUsername();
-        });
     };
 }
 
 //Class Instance
-let usuario = new Usuario();
+let rol = new Rol();

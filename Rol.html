@@ -24,14 +24,14 @@
     <link href="assets/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="assets/css/nprogress/nprogress.css" rel="stylesheet">
-    <!-- bootstrap-datetimepicker -->
-    <link href="assets/css/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">
     <!-- SweetAlert -->
     <link href="assets/css/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="assets/css/custom.css" rel="stylesheet">
     <!-- Switchery -->
     <link href="assets/css/switchery/switchery.min.css" rel="stylesheet">
+    <!-- Select -->
+    <link href="assets/css/bootstrap-select.css" rel="stylesheet">
 
 </head>
 
@@ -154,7 +154,7 @@
                                 <!--  CONTENIDO DE LA PAGINA -->
 
                                 <div class="x_content">
-                                    <form class="form-horizontal form-label-left" id="frmProducto" method="POST" novalidate>
+                                    <form class="form-horizontal form-label-left" id="frmRol" method="POST" novalidate>
 
                                         <!-- <span class="section">Datos Generales</span> -->
 
@@ -178,7 +178,7 @@
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Eventos (Multiple)</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <select class="select2_multiple form-control" multiple="multiple" id="evento" name="evento"></select>
+                                                <select class="selectpicker show-menu-arrow form-control" multiple id="evento" name="evento"></select>
                                             </div>
                                         </div>
                                         
@@ -187,7 +187,7 @@
                                         <div class="form-group">
                                             <div class="col-md-6 col-md-offset-3">
                                                 <button type="reset" class="btn btn-primary">Reset</button>
-                                                <button id="btnUsuario" type="submit" class="btn btn-success">Submit</button>
+                                                <button id="btnRol" type="submit" class="btn btn-success">Submit</button>
                                             </div>
                                         </div>
                                     </form>
@@ -220,8 +220,6 @@
     <script src="assets/js/nprogress/nprogress.js"></script>
     <!-- Moment -->
     <script src="assets/js/moment.min.js"></script>
-    <!-- bootstrap-datetimepicker -->
-    <script src="assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="assets/js/custom.min.js"></script>
     <!-- Validator -->
@@ -229,18 +227,21 @@
     <!-- Input mask -->
     <script src="assets/js/jquery.inputmask/jquery.inputmask.bundle.min.js"></script>
     <!-- JS Scripts -->
-    <script src="assets/js/Producto.js"></script>
+    <script src="assets/js/Rol.js"></script>
+    <script src="assets/js/Evento.js"></script>
     <!-- Sweet Alert -->
     <script src="assets/js/sweetalert2.min.js"></script>
     <!-- Switchery -->
     <script src="assets/js/switchery/switchery.min.js"></script>
-
+    <!-- Select -->
+    <script src="assets/js/bootstrap-select.js"></script>
 </body>
 
 </html>
 
 <script>
     $(document).ready(function () {
-        producto.Init();
+        rol.Init();
+        evento.List        
     });
 </script>

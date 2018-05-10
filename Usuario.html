@@ -32,6 +32,8 @@
     <link href="assets/css/custom.css" rel="stylesheet">
     <!-- Switchery -->
     <link href="assets/css/switchery/switchery.min.css" rel="stylesheet">
+    <!-- Select -->
+    <link href="assets/css/bootstrap-select.css" rel="stylesheet">
 
 </head>
 
@@ -154,7 +156,7 @@
                                 <!--  CONTENIDO DE LA PAGINA -->
 
                                 <div class="x_content">
-                                    <form class="form-horizontal form-label-left" id="frmProducto" method="POST" novalidate>
+                                    <form class="form-horizontal form-label-left" id="frmUsuario" method="POST" novalidate>
 
                                         <!-- <span class="section">Datos Generales</span> -->
 
@@ -163,17 +165,18 @@
                                                 <span class="required">*</span>
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre completo Del usuario">
+                                                <input id="nombre" class="form-control col-md-7 col-xs-12" name="nombre" required="required" type="text" placeholder="Nombre completo Del usuario" data-validate-words="2">
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">Username
-                                                <span class="required">*</span>
+                                                <span class="required">*</span>                                                
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="username" class="form-control col-md-7 col-xs-12" name="username" required="required" type="text" >
+                                                <input id="username" class="form-control col-md-7 col-xs-12" name="username" required="required" type="text" placeholder="Nombre Único de usuario" >                                                
                                             </div>
+                                            <span id="checkusername" class="fa"></span>
                                         </div>
 
                                         <div class="item form-group">
@@ -181,21 +184,21 @@
                                                 <span class="required">*</span>
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="password" class="form-control col-md-7 col-xs-12" name="password" required="required" type="text" >
+                                                <input id="password" class="form-control col-md-7 col-xs-12" name="password" required="required" type="password" data-validate-length-range="6" placeholder="Mínimo 6 caracteres">
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="repetir">Repetir Password</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="repetir" class="form-control col-md-7 col-xs-12" name="repetir" type="text" placeholder="Repita el password">
+                                                <input id="repetir" class="form-control col-md-7 col-xs-12" name="repetir" type="password" placeholder="Repita el password" data-validate-linked="password" required="required">
                                             </div>
                                         </div>
 
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <input id="email" class="form-control col-md-7 col-xs-12" name="email" type="text">
+                                                <input id="email" class="optional form-control col-md-7 col-xs-12" name="email" type="email" >
                                             </div>
                                         </div>
 
@@ -203,7 +206,7 @@
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Activo</label>
                                             <div class="col-md-9 col-sm-9 col-xs-12">
                                                 <label>
-                                                  <input type="checkbox" class="js-switch" checked="" data-switchery="true" style="display: none;">
+                                                  <input type="checkbox" class="js-switch" checked="" data-switchery="true" id="activo" name="activo">
                                                 </label>
                                             </div>
                                         </div>
@@ -211,7 +214,7 @@
                                         <div class="item form-group">
                                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Roles (Multiple)</label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <select class="select2_multiple form-control" multiple="multiple" id="rol" name="rol"></select>
+                                                <select class="selectpicker show-menu-arrow form-control" multiple="multiple" id="rol" name="rol"></select>
                                             </div>
                                         </div>
                                         
@@ -262,11 +265,14 @@
     <!-- Input mask -->
     <script src="assets/js/jquery.inputmask/jquery.inputmask.bundle.min.js"></script>
     <!-- JS Scripts -->
-    <script src="assets/js/Producto.js"></script>
+    <script src="assets/js/Usuario.js"></script>
+    <script src="assets/js/Rol.js"></script>
     <!-- Sweet Alert -->
     <script src="assets/js/sweetalert2.min.js"></script>
     <!-- Switchery -->
     <script src="assets/js/switchery/switchery.min.js"></script>
+    <!-- Select -->
+    <script src="assets/js/bootstrap-select.js"></script>
 
 </body>
 
@@ -274,6 +280,7 @@
 
 <script>
     $(document).ready(function () {
-        producto.Init();
+        usuario.Init();
+        rol.List;
     });
 </script>

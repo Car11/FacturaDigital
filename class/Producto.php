@@ -1,15 +1,13 @@
 <?php
-require_once("Conexion.php");
-//require_once("Log.php");
-//require_once('Globals.php');
-//
-if (!isset($_SESSION))
-    session_start();
-
 if(isset($_POST["action"])){
     $opt= $_POST["action"];
     unset($_POST['action']);
-    //
+    // Classes
+    require_once("Conexion.php");
+    // Session
+    if (!isset($_SESSION))
+        session_start();
+    // Instance
     $producto= new Producto();
     switch($opt){
         case "ReadAll":
@@ -62,7 +60,7 @@ class Producto{
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
             //Categorias del producto.
             if(isset($obj["listacategoria"] )){
-                require_once("CategoriasxProducto.php");
+                require_once("CategoriasXProducto.php");
                 //
                 foreach ($obj["listacategoria"] as $idcat) {
                     $catprod= new CategoriasXProducto();
@@ -101,7 +99,7 @@ class Producto{
             $data= DATA::Ejecutar($sql,$param);     
             foreach ($data as $key => $value){
                 require_once("Categoria.php");
-                $cat= new categoria(); // categorias del producto
+                $cat= new Categoria(); // categorias del producto
                 if($key==0){
                     $this->id = $value['id'];
                     $this->nombre = $value['nombre'];
@@ -147,7 +145,7 @@ class Producto{
             if($data)
             {
                 //save array obj
-                if(CategoriasxProducto::Create($this->listacategoria))
+                if(CategoriasXProducto::Create($this->listacategoria))
                     return true;
                 else throw new Exception('Error al guardar las categorias.', 03);
             }
@@ -173,7 +171,7 @@ class Producto{
             if($data){
                 //update array obj
                 if($this->listacategoria!=null)
-                    if(CategoriasxProducto::Update($this->listacategoria))
+                    if(CategoriasXProducto::Update($this->listacategoria))
                         return true;            
                     else throw new Exception('Error al guardar las categorias.', 03);
                 else {

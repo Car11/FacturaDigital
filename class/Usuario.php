@@ -24,7 +24,7 @@ if(isset($_POST["action"])){
             $usuario->Update();
             break;
         case "Delete":
-            $usuario->Delete();
+            echo json_encode($usuario->Delete());
             break;   
         case "Login":
             $usuario->username= $_POST["username"];
@@ -67,7 +67,7 @@ class Usuario{
     public $eventos= array(); // array de eventos asignados a la sesion de usuario.
     public $url;    
 
-    function __construct(){      
+    function __construct(){
         // identificador único
         if(isset($_POST["id"])){
             $this->id= $_POST["id"];
@@ -340,9 +340,9 @@ class Usuario{
 
     private function CheckRelatedItems(){
         try{
-            $sql="SELECT xx
-                FROM xx R
-                WHERE R.xx= :id";
+            $sql="SELECT idusuario
+                FROM rolesxusuario x
+                WHERE x.idusuario= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -366,12 +366,14 @@ class Usuario{
                 $sessiondata['msg']='Registro en uso'; 
                 return $sessiondata;           
             }                    
-            $sql='DELETE FROM usuario  
+            $sql='DELETE FROM usuario
                 WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

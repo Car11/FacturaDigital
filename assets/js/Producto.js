@@ -89,10 +89,9 @@ class Producto {
                     });
                 else if(data.status==1){
                     swal({
-                        type: 'Warning',
-                        title: 'Registro Relacionado...',
-                        text: 'El registro que intenta eliminar tiene objetos relacionados',
-                        footer: '<a href>Contacte a Soporte Técnico</a>',
+                        type: 'error',
+                        title: 'No es posible eliminar...',
+                        text: 'El registro que intenta eliminar tiene objetos relacionados'
                     });
                 }
                 else {

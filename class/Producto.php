@@ -195,8 +195,8 @@ class Producto{
     private function CheckRelatedItems(){
         try{
             $sql="SELECT idproducto
-                FROM categoriasxproducto R
-                WHERE R.idproducto= :id";
+                FROM categoriasxproducto x
+                WHERE x.idproducto= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -224,8 +224,10 @@ class Producto{
                 WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

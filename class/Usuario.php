@@ -280,14 +280,22 @@ class Usuario{
 
     function Update(){
         try {
-            $sql="UPDATE usuario 
-                SET nombre=:nombre, username=:username, password= :password, email=:email, activo=:activo 
-                WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=>$this->password, ':email'=>$this->email, ':activo'=>$this->activo);
+            if($this->password=='NOCHANGED'){
+                $sql="UPDATE usuario 
+                    SET nombre=:nombre, username=:username, email=:email, activo=:activo 
+                    WHERE id=:id";
+                $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':email'=>$this->email, ':activo'=>$this->activo);
+            }
+            else {
+                $sql="UPDATE usuario 
+                    SET nombre=:nombre, username=:username, password= :password, email=:email, activo=:activo 
+                    WHERE id=:id";
+                $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=> password_hash($this->password, PASSWORD_DEFAULT), ':email'=>$this->email, ':activo'=>$this->activo);
+            }
             $data = DATA::Ejecutar($sql,$param,false);
             if($data){
                 //update array obj
-                if($this->listacategoria!=null)
+                if($this->listarol!=null)
                     if(RolesXUsuario::Update($this->listarol))
                         return true;            
                     else throw new Exception('Error al guardar los roles.', 03);

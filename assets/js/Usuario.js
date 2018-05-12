@@ -37,7 +37,9 @@ class Usuario {
         var miAccion = this.id == null ? 'Create' : 'Update';
         this.nombre = $("#nombre").val();
         this.username = $("#username").val();
-        this.password = $("#password").val();
+        if(this.password==$("#password").val())
+            this.password = 'NOCHANGED';
+        else this.password = $("#password").val();
         this.email = $("#email").val();
         this.activo = $("#activo")[0].checked;
         this.listarol = $('#rol > option:selected').map(function () { return this.value; }).get();
@@ -146,15 +148,7 @@ class Usuario {
         $("#password").val('');
         $("#repetir").val('');
         $("#email").val('');
-        //$('#activo').prop('checked', true);        
-        //$("#activo").attr("checked", true);
-        $("#activo")[0].checked=true;
-        // $("#activo").val("on");
-        // $('.myCheckbox').prop('checked', true);
-        //$("#activo").refresh();
-//         var elem = document.querySelector('.js-switch');
-//         var init = new Switchery(elem);
-        
+        $("#activo")[0].checked=true;        
         $('#rol option').prop("selected", false);
         $("#rol").selectpicker("refresh");
         $('#checkusername').removeClass('fa-check-circle');
@@ -228,6 +222,7 @@ class Usuario {
         $("#nombre").val(usuario.nombre);
         $("#username").val(usuario.username);
         $("#password").val(usuario.password);
+        $("#repetir").val(usuario.password);
         // checkbox
         if(usuario.activo==1){
             // $('#activo').prop('checked', true);

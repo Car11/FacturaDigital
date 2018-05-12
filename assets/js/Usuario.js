@@ -39,7 +39,7 @@ class Usuario {
         this.username = $("#username").val();
         this.password = $("#password").val();
         this.email = $("#email").val();
-        this.activo = $("#activo").val() == 'on' ? 1 : 0;
+        this.activo = $("#activo")[0].checked;
         this.listarol = $('#rol > option:selected').map(function () { return this.value; }).get();
         $.ajax({
             type: "POST",
@@ -146,7 +146,15 @@ class Usuario {
         $("#password").val('');
         $("#repetir").val('');
         $("#email").val('');
-        $("#activo").val('');
+        //$('#activo').prop('checked', true);        
+        //$("#activo").attr("checked", true);
+        $("#activo")[0].checked=true;
+        // $("#activo").val("on");
+        // $('.myCheckbox').prop('checked', true);
+        //$("#activo").refresh();
+//         var elem = document.querySelector('.js-switch');
+//         var init = new Switchery(elem);
+        
         $('#rol option').prop("selected", false);
         $("#rol").selectpicker("refresh");
         $('#checkusername').removeClass('fa-check-circle');
@@ -220,7 +228,19 @@ class Usuario {
         $("#nombre").val(usuario.nombre);
         $("#username").val(usuario.username);
         $("#password").val(usuario.password);
-        $("#activo").val(usuario.activo);
+        // checkbox
+        if(usuario.activo==1){
+            // $('#activo').prop('checked', true);
+            $("#activo")[0].checked=true;
+            // var elem = document.querySelector('#activo');
+            // var init = Switchery(elem);
+        }
+        else {
+            $("#activo")[0].checked=false;
+            // $('#activo').prop('checked', false);
+            // var elem = document.querySelector('#activo');
+            // var init = Switchery(elem);
+        }
         $("#email").val(usuario.email);
         //roles 
         $.each(usuario.listarol, function (i, item) {
@@ -305,6 +325,9 @@ class Usuario {
         $('#username').focusout(function () {
             usuario.CheckUsername();
         });
+
+        //switchery
+        
     };
 }
 

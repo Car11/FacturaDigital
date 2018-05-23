@@ -1,70 +1,57 @@
-class Producto {
+class Rol {
     // Constructor
-    constructor(id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion, cat, UltPro) {
+    constructor(id, nombre, descripcion, evento) {
         this.id = id || null;
         this.nombre = nombre || '';
-        this.nombreAbreviado = nombreAbreviado || '';
         this.descripcion = descripcion || '';
-        this.cantidad = cantidad || 0;
-        this.precio = precio || 0;
-        this.scancode = scancode || '';
-        this.codigoRapido = codigoRapido || '';
-        this.fechaExpiracion = fechaExpiracion || null;
-        this.listacategoria = cat || null;
-        this.UltPro = UltPro || null;
+        this.listaevento = evento || null;
     }
 
     //Getter
     get Read() {
         var miAccion = this.id == null ?  'ReadAll'  : 'Read';
-        if(miAccion=='ReadAll' && $('#tableBody-Producto').length==0 )
+        if(miAccion=='ReadAll' && $('#tableBody-Rol').length==0 )
             return;
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Rol.php",
             data: {
                 action: miAccion,
                 id: this.id
             }
         })
             .done(function (e) {
-                producto.Reload(e);
+                rol.Reload(e);
             })
             .fail(function (e) {
-                producto.showError(e);
+                rol.showError(e);
             });
     }
 
     get Save() {
-        $('#btnProducto').attr("disabled", "disabled");
-        //var miAccion = producto.id == null ? 'Create' : 'Update';
+        $('#btnRol').attr("disabled", "disabled");
         var miAccion = this.id == null ? 'Create' : 'Update';
         this.nombre = $("#nombre").val();
-        this.nombreAbreviado = $("#nombreAbreviado").val();
         this.descripcion = $("#descripcion").val();
-        this.cantidad = $("#cantidad").val();
-        this.precio = $("#precio").val();
-        this.scancode = $("#scancode").val();
-        this.codigoRapido = $("#codigoRapido").val();
-        this.fechaExpiracion = $("#fechaExpiracion").val() == "" ? null : moment($("#fechaExpiracion").val(), 'DD/MM/YYYY').unix(); // UTC TIMESTAMP
-        this.listacategoria = $('#categoria > option:selected').map(function () { return this.value; }).get();
+        // Lista de eventos seleccionados.
+        this.listaevento = $('#evento > option:selected').map(function () { return this.value; }).get();
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Rol.php",
             data: {
                 action: miAccion,
                 obj: JSON.stringify(this)
             }
         })
-            .done(producto.showInfo)
+            .done(rol.showInfo)
             .fail(function (e) {
-                producto.showError(e);
+                rol.showError(e);
             })
             .always(function () {
-                setTimeout('$("#btnProducto").removeAttr("disabled")', 1000);
-                producto = new Producto();
-                producto.ClearCtls();
-                producto.Read;
+                setTimeout('$("#btnRol").removeAttr("disabled")', 1000);
+                rol = new Rol();
+                rol.ClearCtls();
+                rol.Read;
                 $("#nombre").focus();
             });
     }
@@ -72,7 +59,7 @@ class Producto {
     get Delete() {
         $.ajax({
             type: "POST",
-            url: "class/Producto.php",
+            url: "class/Rol.php",
             data: {
                 action: 'Delete',
                 id: this.id
@@ -97,7 +84,7 @@ class Producto {
                 }
                 else {
                     swal({
-                        type: 'Error',
+                        type: 'error',
                         title: 'Ha ocurrido un error...',
                         text: 'El registro no ha sido eliminado',
                         footer: '<a href>Contacte a Soporte Técnico</a>',
@@ -105,12 +92,32 @@ class Producto {
                 }
             })
             .fail(function (e) {
-                producto.showError(e);
+                rol.showError(e);
             })
             .always(function () {
-                producto = new Producto();
-                producto.Read;
+                rol = new Rol();
+                rol.Read;
             });
+    }
+
+    get List() {
+        var miAccion= 'ReadAll';
+        $.ajax({
+            type: "POST",
+            url: "class/Rol.php",
+            data: { 
+                action: miAccion
+            }
+        })
+        .done(function( e ) {
+            rol.ShowList(e);
+        })    
+        .fail(function (e) {
+            rol.showError(e);
+        })
+        .always(function (e){
+            $("#rol").selectpicker("refresh");
+        });
     }
 
     // Methods
@@ -148,33 +155,26 @@ class Producto {
     ClearCtls() {
         $("#id").val('');
         $("#nombre").val('');
-        $("#nombreAbreviado").val('');
         $("#descripcion").val('');
-        $("#cantidad").val('');
-        $("#precio").val('');
-        $("#scancode").val('');
-        $("#codigoRapido").val('');
-        $("#fechaExpiracion").val('');
-        $('#categoria option').prop("selected", false);
+        $('#evento option').prop("selected", false);
+        $("#evento").selectpicker("refresh");
     };
 
     ShowAll(e) {
         // Limpia el div que contiene la tabla.
-        $('#tableBody-Producto').html("");
-        // // Carga lista
+        $('#tableBody-Rol').html("");
+        // Carga lista
         var data = JSON.parse(e);
-        //style="display: none"
+        //
         $.each(data, function (i, item) {
-            $('#tableBody-Producto').append(`
+            $('#tableBody-Rol').append(`
                 <tr> 
                     <td class="a-center ">
                         <input type="checkbox" class="flat" name="table_records">
                     </td>
                     <td class="itemId" >${item.id}</td>
                     <td>${item.nombre}</td>
-                    <td>${item.codigoRapido}</td>
-                    <td>${item.cantidad}</td>
-                    <td>${item.precio}</td>
+                    <td>${item.descripcion}</td>
                     <td class=" last">
                         <a id="update${item.id}" data-toggle="modal" data-target=".bs-example-modal-lg" > <i class="glyphicon glyphicon-edit" > </i> Editar </a> | 
                         <a id="delete${item.id}"> <i class="glyphicon glyphicon-trash"> </i> Eliminar </a>
@@ -182,21 +182,15 @@ class Producto {
                 </tr>
             `);
             // event Handler
-            $('#update'+item.id).click(producto.UpdateEventHandler);
-            $('#delete'+item.id).click(producto.DeleteEventHandler);
+            $('#update'+item.id).click(rol.UpdateEventHandler);
+            $('#delete'+item.id).click(rol.DeleteEventHandler);
         })
         //datatable         
-        if ($.fn.dataTable.isDataTable('#dsProducto')) {
-            var table = $('#dsProducto').DataTable();
-            //table.destroy();
+        if ($.fn.dataTable.isDataTable('#dsRol')) {
+            var table = $('#dsRol').DataTable();
         }
-        /*else {
-            table = $('#example').DataTable( {
-                paging: false
-            } );
-        }*/
         else
-            $('#dsProducto').DataTable({
+            $('#dsRol').DataTable({
                 columns: [
                     { title: "Check" },
                     {
@@ -204,81 +198,49 @@ class Producto {
                         //,visible: false
                     },
                     { title: "Nombre" },
-                    { title: "Código Rapido" },
-                    { title: "Cantidad" },
-                    { title: "Precio" },
+                    { title: "Descripcion" },
                     { title: "Action" }
                 ],
                 paging: true,
                 search: true
             });
-
-
-        // var dataTable =$("datatable").DataTable({ 
-        //     "order": [[ 2, "asc" ]]
-        // } ); 
-
-        // var dataObject = {
-        //     data: [{
-        //         title: "ID"
-        //     }, {
-        //         title: "COUNTY"
-        //     }]
-        // };
-
-        // var columns = [];
-        // $.fn.dataTableExt.afnFiltering.push(
-        // function(oSettings, aData, iDataIndex) {
-        //     var keywords = $(".dataTables_filter input").val().split(' ');  
-        //     var matches = 0;
-        //     for (var k=0; k<keywords.length; k++) {
-        //         var keyword = keywords[k];
-        //         for (var col=0; col<aData.length; col++) {
-        //             if (aData[col].indexOf(keyword)>-1) {
-        //                 matches++;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     return matches == keywords.length;
-        // }
-        // );
     };
 
     UpdateEventHandler() {
-        producto.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
-        producto.Read;
+        rol.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+        rol.Read;
     };
 
     ShowItemData(e) {
         // Limpia el controles
         this.ClearCtls();
         // carga objeto.
-        //var data = JSON.parse(e)[0];
         var data = JSON.parse(e);
-        producto = new Producto(data.id, data.nombre, data.nombreAbreviado, data.descripcion,
-            data.cantidad, data.precio, data.scancode, data.codigoRapido, data.fechaExpiracion, data.listacategoria);
+        rol = new Rol(data.id, data.nombre, data.descripcion, data.listaevento);
         // Asigna objeto a controles
-        $("#id").val(producto.id);
-        $("#nombre").val(producto.nombre);
-        $("#nombreAbreviado").val(producto.nombreAbreviado);
-        $("#descripcion").val(producto.descripcion);
-        $("#precio").val(producto.precio);
-        $("#cantidad").val(producto.cantidad);
-        $("#scancode").val(producto.scancode);
-        $("#codigoRapido").val(producto.codigoRapido);
-        $("#fechaExpiracion").val(
-            producto.fechaExpiracion == null ? null : moment(producto.fechaExpiracion, 'X').format('DD/MM/YYYY')
-        );
-        //Categorías 
-        $.each(producto.listacategoria, function(i, item){
-            $('#categoria option[value=' + item.id + ']').prop("selected", true);
+        $("#id").val(rol.id);
+        $("#nombre").val(rol.nombre);
+        $("#descripcion").val(rol.descripcion);
+        // eventos.
+        $.each(rol.listaevento, function(i, item){
+            $('#evento option[value=' + item.id + ']').prop("selected", true);
         });
-        
+        $("#evento").selectpicker("refresh");
+    };
+
+    ShowList(e) {
+        // carga lista con datos.
+        var data = JSON.parse(e);
+        // Recorre arreglo.
+        $.each(data, function (i, item) {
+            $('#rol').append(`
+                <option value=${item.id}>${item.nombre}</option>
+            `);
+        })
     };
 
     DeleteEventHandler() {
-        producto.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
+        rol.id = $(this).parents("tr").find(".itemId").text();  //Class itemId = ID del objeto.
         // Mensaje de borrado:
         swal({
             title: 'Eliminar?',
@@ -293,7 +255,7 @@ class Producto {
             cancelButtonClass: 'btn btn-danger'
         }).then((result) => {
             if (result.value) {
-                producto.Delete;
+                rol.Delete;
             }
         })
     };
@@ -301,11 +263,11 @@ class Producto {
     Init() {
         // validator.js
         var validator = new FormValidator({ "events": ['blur', 'input', 'change'] }, document.forms[0]);
-        $('#frmProducto').submit(function (e) {
+        $('#frmRol').submit(function (e) {
             e.preventDefault();
             var validatorResult = validator.checkAll(this);
             if (validatorResult.valid)
-                producto.Save;
+                rol.Save;
             return false;
         });
 
@@ -313,13 +275,8 @@ class Producto {
         document.forms[0].onreset = function (e) {
             validator.reset();
         }
-
-        //datepicker.js
-        $('#dpfechaExpiracion').datetimepicker({
-            format: 'DD/MM/YYYY'
-        });
     };
 }
 
 //Class Instance
-let producto = new Producto();
+let rol = new Rol();

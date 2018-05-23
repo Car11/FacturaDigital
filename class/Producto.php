@@ -1,7 +1,13 @@
 <?php
-if (!isset($_SESSION))
-    session_start();
 if(isset($_POST["action"])){
+    $opt= $_POST["action"];
+    unset($_POST['action']);
+    // Classes
+    require_once("Conexion.php");
+    // Session
+    if (!isset($_SESSION))
+        session_start();
+    // Instance
     $producto= new Producto();
     switch($_POST["action"]){
         case "ReadAll":
@@ -57,6 +63,17 @@ class Producto{
             $this->codigorapido= $obj["codigorapido"] ?? 0;
             $this->idcategoria= $obj["idcategoria"] ?? null;
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
+            //Categorias del producto.
+            if(isset($obj["listacategoria"] )){
+                require_once("CategoriasXProducto.php");
+                //
+                foreach ($obj["listacategoria"] as $idcat) {
+                    $catprod= new CategoriasXProducto();
+                    $catprod->idcategoria= $idcat;
+                    $catprod->idproducto= $this->id;
+                    array_push ($this->listacategoria, $catprod);
+                }
+            }
         }
     }
     function ReadAll(){
@@ -81,8 +98,34 @@ class Producto{
                 FROM producto  
                 where id=:id';
             $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql,$param);
-            return $data;
+            $data= DATA::Ejecutar($sql,$param);     
+            foreach ($data as $key => $value){
+                require_once("Categoria.php");
+                $cat= new Categoria(); // categorias del producto
+                if($key==0){
+                    $this->id = $value['id'];
+                    $this->nombre = $value['nombre'];
+                    $this->nombreAbreviado = $value['nombreAbreviado'];
+                    $this->descripcion = $value['descripcion'];
+                    $this->cantidad = $value['cantidad'];
+                    $this->precio = $value['precio'];
+                    $this->scancode = $value['scancode'];
+                    $this->codigoRapido = $value['codigoRapido'];
+                    $this->fechaExpiracion = $value['fechaExpiracion'];
+                    //categoria
+                    if($value['idcategoria']!=null){
+                        $cat->id = $value['idcategoria'];
+                        $cat->nombre = $value['nombrecategoria'];
+                        array_push ($this->listacategoria, $cat);
+                    }
+                }
+                else {
+                    $cat->id = $value['idcategoria'];
+                    $cat->nombre = $value['nombrecategoria'];
+                    array_push ($this->listacategoria, $cat);
+                }
+            }
+            return $this;
         }     
         catch(Exception $e) {
             header('HTTP/1.0 400 Bad error');
@@ -119,7 +162,10 @@ class Producto{
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
-                return true;
+                //save array obj
+                if(CategoriasXProducto::Create($this->listacategoria))
+                    return true;
+                else throw new Exception('Error al guardar las categorias.', 03);
             }
             else throw new Exception('Error al guardar.', 02);
         }     
@@ -138,8 +184,19 @@ class Producto{
                 WHERE id=:id";
             $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
-            if($data)
-                return true;
+            if($data){
+                //update array obj
+                if($this->listacategoria!=null)
+                    if(CategoriasXProducto::Update($this->listacategoria))
+                        return true;            
+                    else throw new Exception('Error al guardar las categorias.', 03);
+                else {
+                    // no tiene categorias
+                    if(CategoriasXProducto::Delete($this->id))
+                        return true;
+                    else throw new Exception('Error al guardar las categorias.', 04);
+                }
+            }
             else throw new Exception('Error al guardar.', 123);
         }     
         catch(Exception $e) {
@@ -152,12 +209,11 @@ class Producto{
     }   
     function CheckRelatedItems(){
         try{
-            // if($this->CheckRelatedItems()){
-            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
-            //     $sessiondata['status']=1; 
-            //     $sessiondata['msg']='Registro en uso'; 
-            //     return $sessiondata;           
-            // }              
+            $sql="SELECT idproducto
+                FROM categoriasxproducto x
+                WHERE x.idproducto= :id";
+            $param= array(':id'=>$this->id);
+            $data= DATA::Ejecutar($sql, $param);
             if(count($data))
                 return $data;
             else return false;
@@ -182,8 +238,10 @@ class Producto{
             WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

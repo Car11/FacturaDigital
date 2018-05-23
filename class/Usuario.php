@@ -1,16 +1,14 @@
 <?php
-require_once("Conexion.php");
-//require_once("Log.php");
-//require_once('Globals.php');
-// Eventos del usuario.
-require_once('Evento.php');
-
-if (!isset($_SESSION))
-    session_start();
-
 if(isset($_POST["action"])){
     $opt= $_POST["action"];
     unset($_POST['action']);
+    // Classes
+    require_once("Conexion.php");
+    require_once('Evento.php');
+    // Session
+    if (!isset($_SESSION))
+        session_start();
+    // Instance
     $usuario= new Usuario();
     switch($opt){
         case "ReadAll":
@@ -26,7 +24,7 @@ if(isset($_POST["action"])){
             $usuario->Update();
             break;
         case "Delete":
-            $usuario->Delete();
+            echo json_encode($usuario->Delete());
             break;   
         case "Login":
             $usuario->username= $_POST["username"];
@@ -34,13 +32,17 @@ if(isset($_POST["action"])){
             $usuario->Login();
             echo json_encode($_SESSION['usersession']);
             break;   
-        case "CheckSession":
+        case "CheckSession":     
             $usuario->CheckSession();
             echo json_encode($_SESSION['usersession']);
             break;
         case "EndSession":
             $usuario->EndSession();
             break;        
+        case "CheckUsername":
+            $usuario->username= $_POST["username"];
+            echo json_encode($usuario->CheckUsername());
+            break;
     }
 }
 
@@ -61,7 +63,8 @@ class Usuario{
     public $email;
     public $activo = 0;
     public $status = userSessionStatus::invalido; // estado de la sesion de usuario.
-    public $roles= array(); // array de eventos del usuario.
+    public $listarol= array(); // array de roles del usuario.
+    public $eventos= array(); // array de eventos asignados a la sesion de usuario.
     public $url;    
 
     function __construct(){
@@ -85,7 +88,7 @@ class Usuario{
                 foreach ($obj["listarol"] as $idrol) {
                     $rolUsr= new RolesXUsuario();
                     $rolUsr->idrol= $idrol;
-                    $rolUsr->idusr= $this->id;
+                    $rolUsr->idusuario= $this->id;
                     array_push ($this->listarol, $rolUsr);
                 }
             }
@@ -118,10 +121,6 @@ class Usuario{
     function EndSession(){
         unset($_SESSION['usersession']);
         //return true;
-    }
-
-    function CreateHash(){
-        return password_hash($this->password, PASSWORD_DEFAULT);
     }
 
     function Login(){
@@ -213,15 +212,15 @@ class Usuario{
 
     function Read(){
         try {
-            $sql='SELECT p.id, p.nombre, p.username, p.password, email, activo, idrol, rol
-                FROM usuario  p LEFT JOIN rolesxusuario cp on cp.idusuario = p.id
-                    LEFT JOIN rol c on c.id = cp.idrol
-                where p.id=:id';
+            $sql='SELECT u.id, u.nombre, u.username, u.password, email, activo, r.id as idrol, r.nombre as nombrerol
+                FROM usuario  u LEFT JOIN rolesxusuario ru on ru.idusuario = u.id
+                    LEFT JOIN rol r on r.id = ru.idrol
+                where u.id=:id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql,$param);     
             foreach ($data as $key => $value){
                 require_once("Rol.php");
-                $rol= new rol(); // crol del producto
+                $rol= new Rol(); // crol del producto
                 if($key==0){
                     $this->id = $value['id'];
                     $this->nombre = $value['nombre'];
@@ -232,13 +231,13 @@ class Usuario{
                     //rol
                     if($value['idrol']!=null){
                         $rol->id = $value['idrol'];
-                        $rol->nombre = $value['rol'];
+                        $rol->nombre = $value['nombrerol'];
                         array_push ($this->listarol, $rol);
                     }
                 }
                 else {
                     $rol->id = $value['idrol'];
-                    $rol->nombre = $value['rol'];
+                    $rol->nombre = $value['nombrerol'];
                     array_push ($this->listarol, $rol);
                 }
             }
@@ -248,22 +247,23 @@ class Usuario{
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
-                'msg' => 'Error al cargar el usuairo'))
+                'msg' => 'Error al cargar el usuario'))
             );
         }
     }
 
     function Create(){
         try {
-            $sql="INSERT INTO usuairo   (id, nombre, username, password, email, activo)
-                VALUES (:uuid, :nombre, :username, :password, :email, :activo, :scancode, :codigoRapido, :fechaExpiracion)";
+            $sql="INSERT INTO usuario   (id, nombre, username, password, email, activo)
+                VALUES (:uuid, :nombre, :username, :password, :email, :activo)";
             //
-            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=>$this->password, ':email'=>$this->email, ':activo'=>$this->activo);
+            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=> password_hash($this->password, PASSWORD_DEFAULT), 
+                ':email'=>$this->email, ':activo'=>$this->activo);
             $data = DATA::Ejecutar($sql,$param, false);
             if($data)
             {
                 //save array obj
-                if(RolesXUsuario::Create($this->listaroles))
+                if(RolesXUsuario::Create($this->listarol))
                     return true;
                 else throw new Exception('Error al guardar los roles.', 03);
             }
@@ -280,14 +280,22 @@ class Usuario{
 
     function Update(){
         try {
-            $sql="UPDATE usuairo 
-                SET nombre=:nombre, username=:username, password= :password, email=:email, activo=:activo 
-                WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=>$this->password, ':email'=>$this->email, ':activo'=>$this->activo);
+            if($this->password=='NOCHANGED'){
+                $sql="UPDATE usuario 
+                    SET nombre=:nombre, username=:username, email=:email, activo=:activo 
+                    WHERE id=:id";
+                $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':email'=>$this->email, ':activo'=>$this->activo);
+            }
+            else {
+                $sql="UPDATE usuario 
+                    SET nombre=:nombre, username=:username, password= :password, email=:email, activo=:activo 
+                    WHERE id=:id";
+                $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':username'=>$this->username, ':password'=> password_hash($this->password, PASSWORD_DEFAULT), ':email'=>$this->email, ':activo'=>$this->activo);
+            }
             $data = DATA::Ejecutar($sql,$param,false);
             if($data){
                 //update array obj
-                if($this->listacategoria!=null)
+                if($this->listarol!=null)
                     if(RolesXUsuario::Update($this->listarol))
                         return true;            
                     else throw new Exception('Error al guardar los roles.', 03);
@@ -309,11 +317,32 @@ class Usuario{
         }
     }   
 
+    function CheckUsername(){
+        try{
+            $sql="SELECT id
+                FROM usuario 
+                WHERE username= :username";
+            $param= array(':username'=>$this->username);
+            $data= DATA::Ejecutar($sql, $param);
+            if(count($data))
+                $sessiondata['status']=1; // usuario duplicado
+            else $sessiondata['status']=0; // usuario unico
+            return $sessiondata;
+        }
+        catch(Exception $e){
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
+    }
+
     private function CheckRelatedItems(){
         try{
-            $sql="SELECT xx
-                FROM xx R
-                WHERE R.xx= :id";
+            $sql="SELECT idusuario
+                FROM rolesxusuario x
+                WHERE x.idusuario= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -337,12 +366,14 @@ class Usuario{
                 $sessiondata['msg']='Registro en uso'; 
                 return $sessiondata;           
             }                    
-            $sql='DELETE FROM usuario  
+            $sql='DELETE FROM usuario
                 WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

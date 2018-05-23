@@ -1,36 +1,34 @@
 <?php
-require_once("Conexion.php");
-//require_once("Log.php");
-//require_once('Globals.php');
-//
-if (!isset($_SESSION))
-    session_start();
-
 if(isset($_POST["action"])){
     $opt= $_POST["action"];
     unset($_POST['action']);
-    //
-    $producto= new Producto();
+    // Classes
+    require_once("Conexion.php");
+    // Session
+    if (!isset($_SESSION))
+        session_start();
+    // Instance
+    $rol= new Rol();
     switch($opt){
         case "ReadAll":
-            echo json_encode($producto->ReadAll());
+            echo json_encode($rol->ReadAll());
             break;
         case "Read":
-            echo json_encode($producto->Read());
+            echo json_encode($rol->Read());
             break;
         case "Create":
-            $producto->Create();
+            $rol->Create();
             break;
         case "Update":
-            $producto->Update();
+            $rol->Update();
             break;
         case "Delete":
-            echo json_encode($producto->Delete());
+            echo json_encode($rol->Delete());
             break;   
     }    
 }
 
-class Producto{
+class Rol{
     public $id=null;
     public $nombre='';
     public $descripcion='';
@@ -48,15 +46,15 @@ class Producto{
             $this->id= $obj["id"] ?? UUID::v4();
             $this->nombre= $obj["nombre"] ?? '';
             $this->descripcion= $obj["descripcion"] ?? '';
-            //Categorias del producto.
+            //Categorias del rol.
             if(isset($obj["listaevento"] )){
-                require_once("CategoriasxProducto.php");
+                require_once("EventosXRol.php");
                 //
-                foreach ($obj["listaevento"] as $idcat) {
-                    $catprod= new CategoriasXProducto();
-                    $catprod->idcategoria= $idcat;
-                    $catprod->idproducto= $this->id;
-                    array_push ($this->listaevento, $catprod);
+                foreach ($obj["listaevento"] as $ideven) {
+                    $evenrol= new EventosXRol();
+                    $evenrol->idevento= $ideven;
+                    $evenrol->idrol= $this->id;
+                    array_push ($this->listaevento, $evenrol);
                 }
             }
         }
@@ -64,8 +62,8 @@ class Producto{
 
     function ReadAll(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigoRapido
-                FROM     producto       
+            $sql='SELECT id, nombre, descripcion
+                FROM     rol       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
             return $data;
@@ -81,36 +79,30 @@ class Producto{
 
     function Read(){
         try {
-            $sql='SELECT p.id, p.nombre, p.nombreAbreviado, p.descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion, c.id as idcategoria,c.nombre as nombrecategoria
-                FROM producto  p LEFT JOIN categoriasxproducto cp on cp.idproducto = p.id
-                    LEFT join categoria c on c.id = cp.idcategoria
-                where p.id=:id';
+            $sql='SELECT r.id, r.nombre, r.descripcion,  e.id as idevento , e.nombre as nombreevento
+                FROM rol  r LEFT JOIN EventosXRol er on er.idrol = r.id
+                    LEFT join evento e on e.id = er.idevento
+                where r.id=:id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql,$param);     
             foreach ($data as $key => $value){
-                require_once("Categoria.php");
-                $cat= new categoria(); // categorias del producto
+                require_once("Evento.php");
+                $evento= new Evento(); // categorias del rol
                 if($key==0){
                     $this->id = $value['id'];
                     $this->nombre = $value['nombre'];
-                    $this->nombreAbreviado = $value['nombreAbreviado'];
                     $this->descripcion = $value['descripcion'];
-                    $this->cantidad = $value['cantidad'];
-                    $this->precio = $value['precio'];
-                    $this->scancode = $value['scancode'];
-                    $this->codigoRapido = $value['codigoRapido'];
-                    $this->fechaExpiracion = $value['fechaExpiracion'];
-                    //categoria
-                    if($value['idcategoria']!=null){
-                        $cat->id = $value['idcategoria'];
-                        $cat->nombre = $value['nombrecategoria'];
-                        array_push ($this->listaevento, $cat);
+                    // Evento
+                    if($value['idevento']!=null){
+                        $evento->id = $value['idevento'];
+                        $evento->nombre = $value['nombreevento'];
+                        array_push ($this->listaevento, $evento);
                     }
                 }
                 else {
-                    $cat->id = $value['idcategoria'];
-                    $cat->nombre = $value['nombrecategoria'];
-                    array_push ($this->listaevento, $cat);
+                    $evento->id = $value['idevento'];
+                    $evento->nombre = $value['nombreevento'];
+                    array_push ($this->listaevento, $evento);
                 }
             }
             return $this;
@@ -119,25 +111,24 @@ class Producto{
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
-                'msg' => 'Error al cargar el producto'))
+                'msg' => 'Error al cargar el rol'))
             );
         }
     }
 
     function Create(){
         try {
-            $sql="INSERT INTO producto   (id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion)
-                VALUES (:uuid, :nombre, :nombreAbreviado, :descripcion, :cantidad, :precio, :scancode, :codigoRapido, :fechaExpiracion)";
+            $sql="INSERT INTO rol   (id, nombre, descripcion)
+                VALUES (:uuid, :nombre, :descripcion)";
             //
-            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio,
-                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
+            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param, false);
             if($data)
             {
                 //save array obj
-                if(CategoriasxProducto::Create($this->listaevento))
+                if(EventosXRol::Create($this->listaevento))
                     return true;
-                else throw new Exception('Error al guardar las categorias.', 03);
+                else throw new Exception('Error al guardar los eventos.', 03);
             }
             else throw new Exception('Error al guardar.', 02);
         }     
@@ -152,23 +143,22 @@ class Producto{
 
     function Update(){
         try {
-            $sql="UPDATE producto 
-                SET nombre=:nombre, nombreAbreviado=:nombreAbreviado, descripcion= :descripcion, cantidad=:cantidad, precio=:precio, scancode=:scancode, codigoRapido=:codigoRapido, fechaExpiracion=:fechaExpiracion
+            $sql="UPDATE rol 
+                SET nombre=:nombre, descripcion= :descripcion 
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio , 
-                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':descripcion'=>$this->descripcion);
             $data = DATA::Ejecutar($sql,$param,false);
             if($data){
                 //update array obj
                 if($this->listaevento!=null)
-                    if(CategoriasxProducto::Update($this->listaevento))
+                    if(EventosXRol::Update($this->listaevento))
                         return true;            
-                    else throw new Exception('Error al guardar las categorias.', 03);
+                    else throw new Exception('Error al guardar los eventos.', 03);
                 else {
-                    // no tiene categorias
-                    if(CategoriasXProducto::Delete($this->id))
+                    // no tiene categorieventos
+                    if(EventosXRol::Delete($this->id))
                         return true;
-                    else throw new Exception('Error al guardar las categorias.', 04);
+                    else throw new Exception('Error al guardar los eventos.', 04);
                 }
             }
             else throw new Exception('Error al guardar.', 123);
@@ -184,9 +174,9 @@ class Producto{
 
     private function CheckRelatedItems(){
         try{
-            $sql="SELECT idproducto
-                FROM categoriasxproducto R
-                WHERE R.idproducto= :id";
+            $sql="SELECT idrol
+                FROM EventosXRol x
+                WHERE x.idrol= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -210,12 +200,14 @@ class Producto{
                 $sessiondata['msg']='Registro en uso'; 
                 return $sessiondata;           
             }                    
-            $sql='DELETE FROM producto  
+            $sql='DELETE FROM rol  
                 WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }                
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

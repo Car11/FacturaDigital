@@ -1,17 +1,9 @@
 <?php
-require_once("Conexion.php");
-//require_once("Log.php");
-//require_once('Globals.php');
-//
 if (!isset($_SESSION))
     session_start();
-
 if(isset($_POST["action"])){
-    $opt= $_POST["action"];
-    unset($_POST['action']);
-    //
     $producto= new Producto();
-    switch($opt){
+    switch($_POST["action"]){
         case "ReadAll":
             echo json_encode($producto->ReadAll());
             break;
@@ -25,64 +17,57 @@ if(isset($_POST["action"])){
             $producto->Update();
             break;
         case "Delete":
-            echo json_encode($producto->Delete());
+            $producto->Delete();
             break;   
-    }    
+        case "CheckRelatedItems":  
+            echo json_encode($producto->CheckRelatedItems());
+            break;  
+        case "ReadByCode":  
+            echo json_encode($producto->ReadByCode());
+            break;
+    }
 }
-
 class Producto{
     public $id=null;
     public $nombre='';
-    public $nombreAbreviado='';
-    public $descripcion='';    
     public $cantidad=0;
-    public $precio=0;
     public $scancode='';
-    public $codigoRapido='';
+    public $precio=0;
+    public $codigorapido='';
+    public $idcategoria='';
     public $fechaExpiracion=null;
-    public $listacategoria= array();
-    
-
+    public $descripcion='';
     function __construct(){
+        require_once("Conexion.php");
+        //require_once("Log.php");
+        //require_once('Globals.php');
+        //
         // identificador único
         if(isset($_POST["id"])){
             $this->id= $_POST["id"];
         }
         if(isset($_POST["obj"])){
             $obj= json_decode($_POST["obj"],true);
-            require_once("UUID.php");
-            $this->id= $obj["id"] ?? UUID::v4();
+            $this->id= $obj["id"] ?? null;
             $this->nombre= $obj["nombre"] ?? '';
-            $this->nombreAbreviado= $obj["nombreAbreviado"] ?? '';
             $this->descripcion= $obj["descripcion"] ?? '';
             $this->cantidad= $obj["cantidad"] ?? 0;            
+            $this->scancode= $obj["scancode"] ?? '';
             $this->precio= $obj["precio"] ?? 0;
-            $this->scancode= $obj["scancode"] ?? '';            
-            $this->codigoRapido= $obj["codigoRapido"] ?? 0;            
+            $this->codigorapido= $obj["codigorapido"] ?? 0;
+            $this->idcategoria= $obj["idcategoria"] ?? null;
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
-            //Categorias del producto.
-            if(isset($obj["listacategoria"] )){
-                require_once("CategoriasxProducto.php");
-                //
-                foreach ($obj["listacategoria"] as $idcat) {
-                    $catprod= new CategoriasXProducto();
-                    $catprod->idcategoria= $idcat;
-                    $catprod->idproducto= $this->id;
-                    array_push ($this->listacategoria, $catprod);
-                }
-            }
         }
     }
-
     function ReadAll(){
         try {
-            $sql='SELECT id, nombre, nombreAbreviado, scancode, cantidad, precio , codigoRapido
+            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigorapido
                 FROM     producto       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
             return $data;
         }     
-        catch(Exception $e) {
+        catch(Exception $e) {   
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
@@ -90,42 +75,14 @@ class Producto{
             );
         }
     }
-
     function Read(){
         try {
-            $sql='SELECT p.id, p.nombre, p.nombreAbreviado, p.descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion, c.id as idcategoria,c.nombre as nombrecategoria
-                FROM producto  p LEFT JOIN categoriasxproducto cp on cp.idproducto = p.id
-                    LEFT join categoria c on c.id = cp.idcategoria
-                where p.id=:id';
+            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion, descripcion
+                FROM producto  
+                where id=:id';
             $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql,$param);     
-            foreach ($data as $key => $value){
-                require_once("Categoria.php");
-                $cat= new categoria(); // categorias del producto
-                if($key==0){
-                    $this->id = $value['id'];
-                    $this->nombre = $value['nombre'];
-                    $this->nombreAbreviado = $value['nombreAbreviado'];
-                    $this->descripcion = $value['descripcion'];
-                    $this->cantidad = $value['cantidad'];
-                    $this->precio = $value['precio'];
-                    $this->scancode = $value['scancode'];
-                    $this->codigoRapido = $value['codigoRapido'];
-                    $this->fechaExpiracion = $value['fechaExpiracion'];
-                    //categoria
-                    if($value['idcategoria']!=null){
-                        $cat->id = $value['idcategoria'];
-                        $cat->nombre = $value['nombrecategoria'];
-                        array_push ($this->listacategoria, $cat);
-                    }
-                }
-                else {
-                    $cat->id = $value['idcategoria'];
-                    $cat->nombre = $value['nombrecategoria'];
-                    array_push ($this->listacategoria, $cat);
-                }
-            }
-            return $this;
+            $data= DATA::Ejecutar($sql,$param);
+            return $data;
         }     
         catch(Exception $e) {
             header('HTTP/1.0 400 Bad error');
@@ -135,21 +92,34 @@ class Producto{
             );
         }
     }
-
+    function ReadByCode(){
+        try{     
+            $sql="SELECT id, codigorapido, descripcion, precio, cantidad, id FROM producto WHERE codigorapido =:codigorapido OR scancode =:scancode";
+            $param= array(':codigorapido'=>$this->codigorapido,':scancode'=>$this->scancode);
+            $data= DATA::Ejecutar($sql,$param);
+            
+            if(count($data))
+                return $data;
+            else return false;
+        }
+        catch(Exception $e){
+            header('HTTP/1.0 400 Bad error');
+            die(json_encode(array(
+                'code' => $e->getCode() ,
+                'msg' => $e->getMessage()))
+            );
+        }
+    }
     function Create(){
         try {
-            $sql="INSERT INTO producto   (id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion)
-                VALUES (:uuid, :nombre, :nombreAbreviado, :descripcion, :cantidad, :precio, :scancode, :codigoRapido, :fechaExpiracion)";
+            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion, descripcion)
+                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion, :descripcion)";              
             //
-            $param= array(':uuid'=>$this->id, ':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio,
-                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
-            $data = DATA::Ejecutar($sql,$param, false);
+            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
+            $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
-                //save array obj
-                if(CategoriasxProducto::Create($this->listacategoria))
-                    return true;
-                else throw new Exception('Error al guardar las categorias.', 03);
+                return true;
             }
             else throw new Exception('Error al guardar.', 02);
         }     
@@ -161,28 +131,15 @@ class Producto{
             );
         }
     }
-
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET nombre=:nombre, nombreAbreviado=:nombreAbreviado, descripcion= :descripcion, cantidad=:cantidad, precio=:precio, scancode=:scancode, codigoRapido=:codigoRapido, fechaExpiracion=:fechaExpiracion
+                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion, descripcion= :descripcion
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre, ':nombreAbreviado'=>$this->nombreAbreviado, ':descripcion'=>$this->descripcion, ':cantidad'=>$this->cantidad, ':precio'=>$this->precio , 
-                ':scancode'=>$this->scancode, ':codigoRapido'=>$this->codigoRapido, ':fechaExpiracion'=>$this->fechaExpiracion);
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
-            if($data){
-                //update array obj
-                if($this->listacategoria!=null)
-                    if(CategoriasxProducto::Update($this->listacategoria))
-                        return true;            
-                    else throw new Exception('Error al guardar las categorias.', 03);
-                else {
-                    // no tiene categorias
-                    if(CategoriasXProducto::Delete($this->id))
-                        return true;
-                    else throw new Exception('Error al guardar las categorias.', 04);
-                }
-            }
+            if($data)
+                return true;
             else throw new Exception('Error al guardar.', 123);
         }     
         catch(Exception $e) {
@@ -193,16 +150,16 @@ class Producto{
             );
         }
     }   
-
-    private function CheckRelatedItems(){
+    function CheckRelatedItems(){
         try{
-            $sql="SELECT idproducto
-                FROM categoriasxproducto R
-                WHERE R.idproducto= :id";
-            $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql, $param);
+            // if($this->CheckRelatedItems()){
+            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+            //     $sessiondata['status']=1; 
+            //     $sessiondata['msg']='Registro en uso'; 
+            //     return $sessiondata;           
+            // }              
             if(count($data))
-                return true;
+                return $data;
             else return false;
         }
         catch(Exception $e){
@@ -213,17 +170,16 @@ class Producto{
             );
         }
     }
-
     function Delete(){
         try {
-            if($this->CheckRelatedItems()){
-                //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
-                $sessiondata['status']=1; 
-                $sessiondata['msg']='Registro en uso'; 
-                return $sessiondata;           
-            }                    
+            // if($this->CheckRelatedItems()){
+            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+            //     $sessiondata['status']=1; 
+            //     $sessiondata['msg']='Registro en uso'; 
+            //     return $sessiondata;           
+            // }                    
             $sql='DELETE FROM producto  
-                WHERE id= :id';
+            WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
             if($data)
@@ -238,9 +194,5 @@ class Producto{
             );
         }
     }
-
 }
-
-
-
 ?>

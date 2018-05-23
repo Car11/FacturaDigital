@@ -1,6 +1,6 @@
 class Producto {
     // Constructor
-    constructor(id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion, cat) {
+    constructor(id, nombre, nombreAbreviado, descripcion, cantidad, precio, scancode, codigoRapido, fechaExpiracion, cat, UltPro) {
         this.id = id || null;
         this.nombre = nombre || '';
         this.nombreAbreviado = nombreAbreviado || '';
@@ -11,6 +11,7 @@ class Producto {
         this.codigoRapido = codigoRapido || '';
         this.fechaExpiracion = fechaExpiracion || null;
         this.listacategoria = cat || null;
+        this.UltPro = UltPro || null;
     }
 
     //Getter

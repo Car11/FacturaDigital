@@ -9,7 +9,7 @@ if(isset($_POST["action"])){
         session_start();
     // Instance
     $producto= new Producto();
-    switch($_POST["action"]){
+    switch($opt){
         case "ReadAll":
             echo json_encode($producto->ReadAll());
             break;
@@ -39,7 +39,7 @@ class Producto{
     public $cantidad=0;
     public $scancode='';
     public $precio=0;
-    public $codigorapido='';
+    public $codigoRapido='';
     public $idcategoria='';
     public $fechaExpiracion=null;
     public $descripcion='';
@@ -60,7 +60,7 @@ class Producto{
             $this->cantidad= $obj["cantidad"] ?? 0;            
             $this->scancode= $obj["scancode"] ?? '';
             $this->precio= $obj["precio"] ?? 0;
-            $this->codigorapido= $obj["codigorapido"] ?? 0;
+            $this->codigoRapido= $obj["codigoRapido"] ?? 0;
             $this->idcategoria= $obj["idcategoria"] ?? null;
             $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
             //Categorias del producto.
@@ -78,7 +78,7 @@ class Producto{
     }
     function ReadAll(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigorapido
+            $sql='SELECT id, nombre, cantidad, scancode, cantidad, precio , codigoRapido
                 FROM     producto       
                 ORDER BY nombre asc';
             $data= DATA::Ejecutar($sql);
@@ -94,7 +94,7 @@ class Producto{
     }
     function Read(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion, descripcion
+            $sql='SELECT id, nombre, cantidad, scancode, precio , codigoRapido, idcategoria, fechaExpiracion, descripcion
                 FROM producto  
                 where id=:id';
             $param= array(':id'=>$this->id);
@@ -137,8 +137,8 @@ class Producto{
     }
     function ReadByCode(){
         try{     
-            $sql="SELECT id, codigorapido, descripcion, precio, cantidad, id FROM producto WHERE codigorapido =:codigorapido OR scancode =:scancode";
-            $param= array(':codigorapido'=>$this->codigorapido,':scancode'=>$this->scancode);
+            $sql="SELECT id, codigoRapido, descripcion, precio, cantidad, id FROM producto WHERE codigoRapido =:codigoRapido OR scancode =:scancode";
+            $param= array(':codigoRapido'=>$this->codigoRapido,':scancode'=>$this->scancode);
             $data= DATA::Ejecutar($sql,$param);
             
             if(count($data))
@@ -155,10 +155,10 @@ class Producto{
     }
     function Create(){
         try {
-            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion, descripcion)
-                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion, :descripcion)";              
+            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigoRapido, idcategoria, fechaExpiracion, descripcion)
+                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigoRapido, :idcategoria, :fechaExpiracion, :descripcion)";              
             //
-            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
+            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigoRapido'=>$this->codigoRapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
             if($data)
             {
@@ -180,9 +180,9 @@ class Producto{
     function Update(){
         try {
             $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion, descripcion= :descripcion
+                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigoRapido=:codigoRapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion, descripcion= :descripcion
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
+            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigoRapido'=>$this->codigoRapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion, ':descripcion'=>$this->descripcion );
             $data = DATA::Ejecutar($sql,$param,false);
             if($data){
                 //update array obj

@@ -1,83 +1,94 @@
 <?php
-if (!isset($_SESSION))
-    session_start();
-
 if(isset($_POST["action"])){
+    $opt= $_POST["action"];
+    unset($_POST['action']);
+    // Classes
+    require_once("Conexion.php");
+    // Session
+    if (!isset($_SESSION))
+        session_start();
+    // Instance
     $factura= new Factura();
-    switch($_POST["action"]){
-        case "LoadAll":
-            echo json_encode($producto->LoadAll());
+    switch($opt){
+        case "ReadAll":
+            echo json_encode($factura->ReadAll());
             break;
-        case "LoadProducto":
-            echo json_encode($factura->LoadProducto());
+        case "Read":
+            echo json_encode($factura->Read());
             break;
-        case "Insert":
-            $producto->Insert();
+        case "Create":
+            $factura->Create();
             break;
         case "Update":
-            $producto->Update();
+            $factura->Update();
             break;
         case "Delete":
-            echo json_encode($producto->Delete());
+            echo json_encode($factura->Delete());
             break;   
     }
 }
 
 class Factura{
     public $id=null;
-    public $cajero='';
-    public $codigo=0;
-    public $descripcion='';
-    public $precio=0;
-    public $cantidad=0;
-
+    public $idusuario=null;
+    public $fecha=null;
+    //
+    public $subtotal=0;    
+    public $iva=0;
+    public $porcentajeiva=0;
+    public $descuento=0;
+    public $porcentajeDescuento=0;
+    public $total=0;
+    //
+    public $tipopago='';
+    public $pagacon=0;
+    public $vuelto=0;
+    //
+    // public $listaproducto= array();
+    
     function __construct(){
-        require_once("conexion.php");
-        //require_once("Log.php");
-        //require_once('Globals.php');
-        //
-        if(isset($_POST["producto"])){
-            $obj= json_decode($_POST["producto"],true);
-            $this->id= $obj["id"] ?? null;
-            $this->nombre= $obj["nombre"] ?? '';
-            $this->cantidad= $obj["cantidad"] ?? 0;            
-            $this->scancode= $obj["scancode"] ?? '';
-            $this->precio= $obj["precio"] ?? 0;
-            $this->codigo= $obj["p_codigo"] ?? 0;
-            $this->idcategoria= $obj["idcategoria"] ?? null;
-            $this->fechaExpiracion= $obj["fechaExpiracion"] ?? null;
+        // identificador único
+        if(isset($_POST["id"])){
+            $this->id= $_POST["id"];
+        }
+        if(isset($_POST["obj"])){
+            $obj= json_decode($_POST["obj"],true);
+            require_once("UUID.php");
+            $this->id= $obj["id"] ?? UUID::v4();
+            $this->idusuario= $obj["idusuario"] ?? '';
+            $this->idcliente= $obj["idcliente"] ?? '';
+            $this->fecha= $obj["fecha"] ?? '';
+            $this->producto= $obj["producto"] ?? 0;          
+            $this->impventas= $obj["impuesto"] ?? '';
+            $this->descuento= $obj["descuento"] ?? '';            
+            // $this->subtotal= $obj["subtotal"] ?? ''; 
+            // $this->iva= $obj["iva"] ?? 0;            
+            // $this->porcentajeiva= $obj["porcentajeiva"] ?? 0;
+            // $this->porcentajeDescuento= $obj["porcentajeDescuento"] ?? 0;            
+            // $this->total= $obj["total"] ?? null;
+            // Categorias del factura.
+            // if(isset($obj["listaproducto"] )){
+            //     require_once("ProductosXFactura.php");
+            //     //
+            //     foreach ($obj["listaproducto"] as $idprod) {
+            //         $prodfact= new ProductosXFactura();
+            //         $prodfact->idcategoria= $idprod;
+            //         $prodfact->idproducto= $this->id;
+            //         array_push ($this->listaproducto, $prodfact);
+            //     }
+            // }
         }
     }
 
-
-    function LoadProducto(){
+    function ReadAll(){
         try {
-            $sql="SELECT id, cantidad, precio, codigorapido, descripcion FROM producto WHERE codigorapido =:codigorapido";
-            $param= array(':codigorapido'=>$this->codigo);
-            $data= DATA::Ejecutar($sql,$param);
-            return $data;
-        }     
-        catch(Exception $e) {
-            header('HTTP/1.0 400 Bad error');
-            die(json_encode(array(
-                'code' => $e->getCode() ,
-                'msg' => 'Error al cargar el producto'))
-            );
-        }
-    }
-
-
-
-
-    function LoadAll(){
-        try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido
-                FROM     producto       
-                ORDER BY nombre asc';
+            $sql='SELECT id, idusuario, fecha, descuento, iva, porcentajeiva , porcentajeDescuento
+                FROM     factura       
+                ORDER BY idusuario asc';
             $data= DATA::Ejecutar($sql);
             return $data;
         }     
-        catch(Exception $e) {   
+        catch(Exception $e) {
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
@@ -86,34 +97,110 @@ class Factura{
         }
     }
 
-    function Load(){
+    function Read(){
         try {
-            $sql='SELECT id, nombre, cantidad, scancode, precio , codigorapido, idcategoria, fechaExpiracion
-                FROM producto  
-                where id=:id';
+            $sql='SELECT p.id, p.idusuario, p.fecha, p.subtotal, iva, porcentajeiva, descuento, porcentajeDescuento, total, c.id as idcategoria,c.idusuario as nombrecategoria
+                FROM factura  p LEFT JOIN categoriasxproducto cp on cp.idproducto = p.id
+                    LEFT join categoria c on c.id = cp.idcategoria
+                where p.id=:id';
             $param= array(':id'=>$this->id);
-            $data= DATA::Ejecutar($sql,$param);
-            return $data;
+            $data= DATA::Ejecutar($sql,$param);     
+            foreach ($data as $key => $value){
+                require_once("Categoria.php");
+                $cat= new Categoria(); // categorias del factura
+                if($key==0){
+                    $this->id = $value['id'];
+                    $this->idusuario = $value['idusuario'];
+                    $this->fecha = $value['fecha'];
+                    $this->subtotal = $value['subtotal'];
+                    $this->iva = $value['iva'];
+                    $this->porcentajeiva = $value['porcentajeiva'];
+                    $this->descuento = $value['descuento'];
+                    $this->porcentajeDescuento = $value['porcentajeDescuento'];
+                    $this->total = $value['total'];
+                    //categoria
+                    if($value['idcategoria']!=null){
+                        $cat->id = $value['idcategoria'];
+                        $cat->idusuario = $value['nombrecategoria'];
+                        array_push ($this->listaproducto, $cat);
+                    }
+                }
+                else {
+                    $cat->id = $value['idcategoria'];
+                    $cat->idusuario = $value['nombrecategoria'];
+                    array_push ($this->listaproducto, $cat);
+                }
+            }
+            return $this;
         }     
         catch(Exception $e) {
             header('HTTP/1.0 400 Bad error');
             die(json_encode(array(
                 'code' => $e->getCode() ,
-                'msg' => 'Error al cargar el producto'))
+                'msg' => 'Error al cargar el factura'))
             );
         }
     }
-
-    function Insert(){
+/////////////////////////////////////////////
+// function Insert(){
+//     try {
+//         $sql="INSERT INTO factura   (id, usuario, fecha, impventas, cliente, descuento)
+//             VALUES (uuid(), :usuario, :fecha, :impventas, :cliente, :descuento)"; 
+//         $param= array(':usuario'=>$this->usuario,':cliente'=>$this->cliente, ':fecha'=>$this->fecha, 'impventas'=>$this->impventas, 'descuento'=>$this->descuento);
+//         $data = DATA::Ejecutar($sql,$param,false);
+//         if($data)
+//         {
+//             foreach ($this->producto as $insprod) {
+//                 $sql="INSERT INTO productosxfactura   (idfactura, idproducto, precio, cantidad)
+//                     VALUES (:idfactura, :idproducto, :precio, :cantidad)";              
+//                 //
+//                 $param= array(':idfactura'=>"ad23718a-5fec-11e8-af02-c85b76da12f5",':idproducto'=>$insprod[0], ':precio'=>$insprod[3], ':cantidad'=>$insprod[4]);
+//                 $data = DATA::Ejecutar($sql,$param,false);
+//                 if($data)
+//                 {
+//                     // return true;
+//                 }
+//                 else throw new Exception('Error al guardar.', 02);
+//             }
+//         }
+//         else throw new Exception('Error al guardar.', 02);
+//     }     
+//     catch(Exception $e) {
+//         header('HTTP/1.0 400 Bad error');
+//         die(json_encode(array(
+//             'code' => $e->getCode() ,
+//             'msg' => $e->getMessage()))
+//         );
+//     }
+// }
+/////////////////////////////////////////////
+    function Create(){
         try {
-            $sql="INSERT INTO producto   (id,nombre, cantidad, scancode, precio ,codigorapido, idcategoria, fechaExpiracion)
-                VALUES (uuid(),:nombre, :cantidad, :scancode, :precio ,:codigorapido, :idcategoria, :fechaExpiracion)";              
+            // $sql="INSERT INTO factura   (id, idusuario, fecha, subtotal, iva, porcentajeiva, descuento, porcentajeDescuento, total)
+            //     VALUES (:uuid, :idusuario, :fecha, :subtotal, :iva, :porcentajeiva, :descuento, :porcentajeDescuento, :total)";
             //
-            $param= array(':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio, ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion );
-            $data = DATA::Ejecutar($sql,$param,false);
+            $sql="INSERT INTO factura   (id, idusuario, idcliente, fecha, impventas, descuento)
+            VALUES (:uuid, :idusuario, :idcliente, :fecha, :impventas, :descuento)"; 
+        
+            // $param= array(':usuario'=>$this->idusuario,':cliente'=>$this->cliente, ':fecha'=>$this->fecha, 'impventas'=>$this->impventas, 'descuento'=>$this->descuento);
+       
+            $param= array(':uuid'=>$this->id, ':idusuario'=>$this->idusuario, ':idcliente'=>$this->idcliente, ':fecha'=>$this->fecha, 
+            ':impventas'=>$this->impventas, ':descuento'=>$this->descuento);
+            $data = DATA::Ejecutar($sql,$param, false);
             if($data)
             {
-                return true;
+                foreach ($this->producto as $insprod) {
+                    $sql="INSERT INTO productosxfactura   (idfactura, idproducto, precio, cantidad)
+                        VALUES (:idfactura, :idproducto, :precio, :cantidad)";              
+                    //
+                    $param= array(':idfactura'=>$this->id,':idproducto'=>$insprod[0], ':precio'=>$insprod[3], ':cantidad'=>$insprod[4]);
+                    $data = DATA::Ejecutar($sql,$param,false);
+                    if($data)
+                    {
+                        // return true;
+                    }
+                    else throw new Exception('Error al guardar.', 02);
+                }
             }
             else throw new Exception('Error al guardar.', 02);
         }     
@@ -128,13 +215,25 @@ class Factura{
 
     function Update(){
         try {
-            $sql="UPDATE producto 
-                SET nombre=:nombre, cantidad=:cantidad, scancode=:scancode, precio=:precio, codigorapido=:codigorapido, idcategoria=:idcategoria, fechaExpiracion=:fechaExpiracion
+            $sql="UPDATE factura 
+                SET idusuario=:idusuario, fecha=:fecha, subtotal= :subtotal, iva=:iva, porcentajeiva=:porcentajeiva, descuento=:descuento, porcentajeDescuento=:porcentajeDescuento, total=:total
                 WHERE id=:id";
-            $param= array(':id'=>$this->id, ':nombre'=>$this->nombre,':cantidad'=>$this->cantidad,':scancode'=>$this->scancode, ':precio'=>$this->precio , ':codigorapido'=>$this->codigorapido, ':idcategoria'=>$this->idcategoria, ':fechaExpiracion'=>$this->fechaExpiracion );
+            $param= array(':id'=>$this->id, ':idusuario'=>$this->idusuario, ':fecha'=>$this->fecha, ':subtotal'=>$this->subtotal, ':iva'=>$this->iva, ':porcentajeiva'=>$this->porcentajeiva , 
+                ':descuento'=>$this->descuento, ':porcentajeDescuento'=>$this->porcentajeDescuento, ':total'=>$this->total);
             $data = DATA::Ejecutar($sql,$param,false);
-            if($data)
-                return true;
+            if($data){
+                //update array obj
+                if($this->listaproducto!=null)
+                    if(ProductosXFactura::Update($this->listaproducto))
+                        return true;            
+                    else throw new Exception('Error al guardar las categorias.', 03);
+                else {
+                    // no tiene categorias
+                    if(ProductosXFactura::Delete($this->id))
+                        return true;
+                    else throw new Exception('Error al guardar las categorias.', 04);
+                }
+            }
             else throw new Exception('Error al guardar.', 123);
         }     
         catch(Exception $e) {
@@ -146,11 +245,11 @@ class Factura{
         }
     }   
 
-    function CheckRelatedItems(){
+    private function CheckRelatedItems(){
         try{
-            $sql="SELECT id
-                FROM /*  definir relacion */ R
-                WHERE R./*definir campo relacion*/= :id";                
+            $sql="SELECT idproducto
+                FROM categoriasxproducto x
+                WHERE x.idproducto= :id";
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param);
             if(count($data))
@@ -168,18 +267,20 @@ class Factura{
 
     function Delete(){
         try {
-            // if($this->CheckRelatedItems()){
-            //     //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
-            //     $sessiondata['status']=1; 
-            //     $sessiondata['msg']='Registro en uso'; 
-            //     return $sessiondata;           
-            // }                    
-            $sql='DELETE FROM producto  
-            WHERE id= :id';
+            if($this->CheckRelatedItems()){
+                //$sessiondata array que devuelve si hay relaciones del objeto con otras tablas.
+                $sessiondata['status']=1; 
+                $sessiondata['msg']='Registro en uso'; 
+                return $sessiondata;           
+            }                    
+            $sql='DELETE FROM factura  
+                WHERE id= :id';
             $param= array(':id'=>$this->id);
             $data= DATA::Ejecutar($sql, $param, false);
-            if($data)
-                return $sessiondata['status']=0; 
+            if($data){
+                $sessiondata['status']=0; 
+                return $sessiondata;
+            }
             else throw new Exception('Error al eliminar.', 978);
         }
         catch(Exception $e) {

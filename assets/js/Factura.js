@@ -1,24 +1,27 @@
 class Factura {
     // Constructor
-    constructor(id, cajero, subtotal, descuento, producto, total, fechaCreacion, idfila, codigorapido, scancode, descripcion, precio, cantidad, importe, t) {
+    constructor(id, cajero, producto, descuento, total, fechaCreacion, importe, t, idusuario, idcliente) {
         this.id = id || null;
         this.cajero = cajero || '';
-        this.subtotal=subtotal || '';
+        this.idusuario = idusuario || '';
+        this.idcliente = idcliente || '';
         this.descuento=descuento || 0;
         this.producto=producto || new Array(new Array ());
         this.total= total || '';
         this.fechaCreacion= fechaCreacion || null;
-        this.idfila=idfila || 0;
-        this.codigorapido= codigorapido || '';
-        this.scancode= scancode || '';
-        this.precio= precio || 0;
-        this.cantidad=cantidad || 0;
         this.importe=importe || 0;
+        this.t=t || null;
     }
     //Get
-    get Importe() {
-    return this.cantidad * this.precio;
-    }
+    // get Importe() {
+    // return this.cantidad * this.precio;
+    // }
+
+    
+    // get Save() {
+        
+    // }
+
 }
 
 let factura = new Factura();
@@ -26,6 +29,8 @@ let factura = new Factura();
 // var t; //En esta variable se guarda la tabla de productos a facturar
 $(document).ready(function () {
     $('#open_modal_fac').attr("disabled", true);
+
+    btnFormaPago()
 
     //Valida si se presiona enter -> carga el producto en la lista
     //si preciona "*" -> Quita el "*", pasa el punto de insercion a la cantidad y selecciona el valor para ser reemplazdo con el teclado
@@ -60,7 +65,7 @@ $(document).ready(function () {
         "language": {
             "infoEmpty": "No hay productos agregados",
             "emptyTable": "No hay productos agregados",
-            "search": "Buscar Productos" //Cambia el texto de Search
+            "search": "Buscar En Factura" //Cambia el texto de Search
         },
         "columns": [
             { "title": "id" },
@@ -106,7 +111,7 @@ $(document).ready(function () {
 // Carga el producto a la lista de la factura
 function LoadProducto() {
     if ($("#p_searh").val() != ""){
-        producto.codigorapido = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
+        producto.codigoRapido = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
         producto.scancode = $("#p_searh").val();  //Columna 0 de la fila seleccionda= ID.
         $.ajax({
             type: "POST",
@@ -126,7 +131,6 @@ function LoadProducto() {
     }
 };
 
-
 // valida que el producto nuevo a ingresar no este en la lista
 // si esta en la lista lo suma a la cantidad
 // si es nuevo lo agrega a la lista
@@ -135,12 +139,12 @@ function ValidateProductFac(e){
     // carga lista con datos.
     if(e != "false"){
         producto = JSON.parse(e)[0];
-        producto.UltPrd = producto.codigorapido;
+        producto.UltPrd = producto.codigoRapido;
         var repetido = false;
 
         if(document.getElementById("productos").rows.length != 0 && producto != null){
             $(document.getElementById("productos").rows).each(function(i,item){
-                if(item.childNodes[0].innerText==producto.codigorapido){
+                if(item.childNodes[0].innerText==producto.codigoRapido){
                      item.childNodes[3].childNodes["0"].attributes[3].value = producto.cantidad;
                      var CantAct = parseInt(item.childNodes[3].firstElementChild.value);
                     if (parseInt(producto.cantidad) > CantAct ){
@@ -173,14 +177,14 @@ function ValidateProductFac(e){
 function AgregaPrd(){
     producto.UltPro = producto.codigoRapido;
     var rowNode = t   //t es la tabla de productos
-    .row.add( [producto.id, producto.codigorapido, producto.descripcion, "¢"+producto.precio, "1", "¢"+producto.precio])
+    .row.add( [producto.id, producto.codigoRapido, producto.descripcion, "¢"+producto.precio, "1", "¢"+producto.precio])
     .draw() //dibuja la tabla con el nuevo producto
     .node();     
-    $('td:eq(2)', rowNode).attr({id: ("prec_"+producto.codigorapido)});
-    $('td:eq(4)', rowNode).attr({id: ("impo_"+producto.codigorapido)});
-    $('td:eq(3) input', rowNode).attr({id: ("cant_"+producto.codigorapido), max:  producto.cantidad, min: "0", step:"1", value:"1", onchage:"CalcImporte("+producto.codigorapido+")"});
+    $('td:eq(2)', rowNode).attr({id: ("prec_"+producto.codigoRapido)});
+    $('td:eq(4)', rowNode).attr({id: ("impo_"+producto.codigoRapido)});
+    $('td:eq(3) input', rowNode).attr({id: ("cant_"+producto.codigoRapido), max:  producto.cantidad, min: "0", step:"1", value:"1", onchage:"CalcImporte("+producto.codigoRapido+")"});
     $('td:eq(3) input', rowNode).change(function(){
-        CalcImporte(producto.codigorapido);
+        CalcImporte(producto.codigoRapido);
     });
     t.order([0, 'desc']).draw();
     t.columns.adjust().draw();
@@ -191,11 +195,8 @@ function AgregaPrd(){
 //Calcula el nuevo importe al cambiar la cantidad del prodcuto seleccionado de forma manual y no por producto repetido.
 function CalcImporte(prd){
     producto.UltPrd = prd;//validar
-    // $('td:eq(3) input', rowNode).attr({id: ("cant_"+producto.codigorapido), max:  producto.cantidad, min: "0", step:"1", value:"1"});
     pUnit = $(`#prec_${prd}`)[0].textContent.replace("¢","");
     cant = parseInt($(`#cant_${prd}`)[0].value);
-
-    // $(this).addClass('selected');
 
     if(cant <= parseInt($(`#cant_${prd}`)[0].attributes[3].value)){
         $(`#impo_${prd}`)[0].textContent = "¢" + (parseFloat(pUnit) * parseFloat(cant)).toString();
@@ -224,13 +225,6 @@ function CalcImporte(prd){
         calcTotal();
         $("#p_searh").focus();
     }
-    //  if (cant==0){
-    //     BorraRow(prd);
-    //     calcTotal();
-    //    }
-    //     calcTotal();
-        // $("#p_searh").focus();
-    //  calcTotal();
 };
 
 //Calcula los totales cada vez que un producto es modificado
@@ -258,13 +252,13 @@ function calcTotal(){
     }
 };
 
-
+//Elimana el producto de la factura 
 function BorraRow(prd) {
     $(`#prec_${prd}`)["0"].parentElement.attributes[1].value = ($(`#prec_${prd}`)["0"].parentElement.attributes[1].value) + " selected";
     t.row('.selected').remove().draw( false );
 } 
 
-$( "#fac-ccard" ).click(function(event) {
+function facCard (){
     $("#formapago").empty();
     var DivCard =
     `<div class="row">
@@ -274,23 +268,27 @@ $( "#fac-ccard" ).click(function(event) {
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            <input class="input-lg" type="text" placeholder="Ingrese Numero Referencia" required="" minlength="5" autofocus="">
+            <input class="input-lg valPago" type="text" onkeyup="valPago(this.value)" placeholder="Ingrese Numero Referencia" required="" minlength="5" autofocus="">
         </div>
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4 col-sm-offset-0 col-xs-6 col-xs-offset-0">
-            <button type="button" onclick="NewFact()" class="btn btn-primary procesarFac" disabled style="margin-top:10px;">Procesar</button>
+            <button type="button" onclick="CreateFact()" class="btn btn-primary procesarFac" disabled style="margin-top:10px;">Procesar</button>
         </div>
     </div>`;
     $("#formapago").append(DivCard);
 
 
+    $("#btn-formapago").empty();
+    var DivCash =
+    `<button type="button" id="modalFormaPago" onclick="btnFormaPago()"class="btn btn-primary">Atras</button>`;
+    $("#btn-formapago").append(DivCash);
+};
 
-});
 
-
-$( "#fac-cash" ).click(function(event) {
+function facCash(){
     $("#formapago").empty();
+
     var DivCash =
     `<div class="row">
         <div class="col-md-4 col-md-offset-4 col-sm-offset-0 col-xs-6 col-xs-offset-0">
@@ -299,40 +297,138 @@ $( "#fac-cash" ).click(function(event) {
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            <input id="pagocash" class="input-lg" type="text" placeholder="Ingrese Monto en Efectivo"  required="" minlength="5" autofocus="">
+            <input id="pagocash" class="input-lg valPago" onkeyup="valPago(this.value)" type="text" placeholder="Ingrese Monto en Efectivo"  required="" minlength="5" autofocus="">
         </div>
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4 col-sm-offset-0 col-xs-6 col-xs-offset-0">
-            <button type="button" onclick="NewFact()" class="btn btn-primary procesarFac"  style="margin-top:10px;">Procesar</button>
+            <button type="button" onclick="CreateFact()" class="btn btn-primary procesarFac" disabled style="margin-top:10px;">Procesar</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4 col-sm-offset-0 col-xs-6 col-xs-offset-0">
+            <h3 class="text-left" id="vuelto">Su vuelto:</h3>
         </div>
     </div>`;
+    $("#formapago").append(DivCash);    
+
+
+    $("#btn-formapago").empty();
+    var DivCash =
+    `<button type="button" id="modalFormaPago" onclick="btnFormaPago()"class="btn btn-primary">Atras</button>`;
+    $("#btn-formapago").append(DivCash);
+};
+
+function btnFormaPago() {
+    $("#formapago").empty();
+    var DivCash =
+    `<div class="col-md-2"></div>
+    <div class="col-md-3" onclick="facCard()">
+        <img id="fac-ccard" src="images/credit-cards.png" class="modal-img-pago">
+        <p class="text-center">Tarjeta</p>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-3" onclick="facCash()">
+        <img id="fac-cash" src="images/cash.png" class="modal-img-pago">
+        <p class="text-center">Efectivo</p>
+    </div>`;
     $("#formapago").append(DivCash);
-});
+
+    $("#btn-formapago").empty();
+    var DivCash =
+    `<button type="button" id="modalPago" class="btn btn-primary" data-dismiss="modal">Atras</button>`;
+    $("#btn-formapago").append(DivCash);
+};
+
+function valPago(val){
+    
+    xPagar = parseFloat(($("#total")[0].textContent).replace("¢",""));
+    pago = parseFloat($('.valPago').val());    
 
 
+    if (isNaN($('.valPago').val())){
+        // alert("numero");
+        val = val.replace(/[^0-9]/g, '');
+        $(".valPago").val(val);
 
+    }else{
+        if(pago >= xPagar){
+            $(".procesarFac").prop('disabled', false);
+            calcVuelto(pago, xPagar);
+        }
+        else
+            {
+                $(".procesarFac").prop('disabled', true);
+            }
+    }
 
-function NewFact(){
+};
 
+function CreateFact(){
     $(t.columns().data()[0]).each(function(ic,c){
             factura.producto[ic]=$(t.rows().data()[ic]);
     });
 
+    var miAccion = this.id == null ? 'Create' : 'Update';
+    
+    $.ajax({
+        type: "POST",
+        url: "class/Factura.php",
+        data: {
+            action: miAccion,
+            obj: JSON.stringify(factura)
+        }
+    })
+        .done(alertFact()
+    
+        )
+        .fail(function (e) {
+            producto.showError(e);
+        })
+        .always(function () {
+            setTimeout('$("#btnProducto").removeAttr("disabled")', 1000);
+            producto = new Producto();
+            producto.ClearCtls();
+            producto.Read;
+            $("#nombre").focus();
+        });
 }
 
-
-
+//informa de cantidad de producto
 function alertSwal(cant) {
     swal({
         type: 'info',
         title: 'Oops...',
         text: 'Cantidad Inexistente de Producto!',
-        footer: '<a href>La cantidad maxima de producto disponble es: '+ cant +'</a>',
-        showConfirmButton: false,
+        footer: '<h3>Cantidad maxima de producto disponble es: '+ cant +'</h3>',
+        // showConfirmButton: false,
+        timer: 3500
+    });
+    // alert('La cantidad maxima de producto disponble es: '+ cant);
+} 
+
+//Informa que la factura fue agregada
+function alertFact() {
+    swal({
+        type: 'success',
+        text: 'Factura Lista!',
         timer: 2000
     });
-} 
+    $(".procesarFac").prop('disabled', true);
+    // calcVuelto();
+    setTimeout(function() {location.reload();},2000);
+}
+
+function calcVuelto(pago, xPagar) {
+    // $("#vuelto").val(pago-xPagar);
+    vuelto = ((pago-xPagar).toFixed(2)).toString();
+
+    // $("#vuelto").val("EJEMPLO");
+    $("#vuelto")["0"].textContent = "Su cambio: "+vuelto;
+
+    
+
+}
 
 // Muestra errores en ventana
 function showError(e) {    
@@ -414,7 +510,7 @@ function CleanCtls() {
 //                 '<td>' + item.scancode + '</td>' +
 //                 '<td>' + item.cantidad + '</td>' +
 //                 '<td>' + item.precio + '</td>' +
-//                 '<td>' + item.codigorapido + '</td>' +
+//                 '<td>' + item.codigoRapido + '</td>' +
 //                 '<td><img id=btnmodingreso'+ item.id + ' src=img/file_mod.png></td>'+
 //                 '<td><img id=btnborraingreso'+ item.id + ' src=img/file_delete.png></td>'+
 //             '</tr>';
@@ -512,13 +608,13 @@ function CleanCtls() {
 //     CleanCtls();    
 //     // carga objeto.
 //     var data = JSON.parse(e)[0];
-//     producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigorapido, data.idcategoria, data.fechaExpiracion);
+//     producto = new Producto(data.id, data.nombre, data.scancode, data.cantidad, data.precio, data.codigoRapido, data.idcategoria, data.fechaExpiracion);
 //     // Asigna objeto a controles
 //     $("#id").val(producto.id);
 //     $("#nombre").val(producto.nombre);
 //     $("#precio").val(producto.precio);
 //     $("#cantidad").val(producto.cantidad);
-//     $("#codigorapido").val(producto.codigorapido);
+//     $("#codigoRapido").val(producto.codigoRapido);
 //     $("#categoria").val(producto.idcategoria);
 //     $("#fechaExpiracion").val(producto.fechaExpiracion);
 // };
@@ -529,7 +625,7 @@ function CleanCtls() {
 //     producto.nombre = $("#nombre").val();
 //     producto.cantidad = $("#cantidad").val();
 //     producto.precio = $("#precio").val();
-//     producto.codigorapido = $("#codigorapido").val();
+//     producto.codigoRapido = $("#codigoRapido").val();
 //     producto.idcategoria= $("#categoria").val();
 //     producto.fechaExpiracion= $("#fechaExpiracion").val();
 //     //
@@ -566,13 +662,13 @@ function CleanCtls() {
 //                     <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
 //                 </div>
 //             </td>
-//             <td class="codigorapido" id="id_${item.codigorapido}"> ${item.codigorapido} </td>
+//             <td class="codigoRapido" id="id_${item.codigoRapido}"> ${item.codigoRapido} </td>
 //             <td class="descripcion">${item.descripcion}</td>
-//             <td class=" " id="precio_${item.codigorapido}">¢${item.precio}</td>
+//             <td class=" " id="precio_${item.codigoRapido}">¢${item.precio}</td>
 //             <td class="">
-//                <input class="cantidad form-control" type="number" min="1" max="999" step="1" value="1" id="cant_${item.codigorapido}" onchange="importe(${item.codigorapido})">
+//                <input class="cantidad form-control" type="number" min="1" max="999" step="1" value="1" id="cant_${item.codigoRapido}" onchange="importe(${item.codigoRapido})">
 //             </td>
-//                 <td id="importe_${item.codigorapido}">¢${item.precio}</td>
+//                 <td id="importe_${item.codigoRapido}">¢${item.precio}</td>
 //         </tr>`;
 //         //<option value="'+ item.id + '">'+ item.nombre + '</option>';
 //         $('#productos').append(opt);

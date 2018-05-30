@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
+    <!-- check User session -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/Session.js"></script>
+    <script>
+        Session.Check();
+    </script>
+    <!-- /End check -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
@@ -16,7 +24,7 @@
     <!-- NProgress -->
     <link href="assets/css/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-   <link href="assets/css/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="assets/css/iCheck/skins/flat/green.css" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="assets/css/custom.min.css" rel="stylesheet">
     <!-- Custom Table Scroll -->
@@ -34,7 +42,10 @@
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
                     <div class="navbar nav_title" style="border: 0;">
-                        <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Fac-CR!</span></a>
+                        <a href="index.html" class="site_title">
+                            <i class="fa fa-paw"></i>
+                            <span>Fac-CR!</span>
+                        </a>
                     </div>
 
                     <div class="clearfix"></div>
@@ -58,14 +69,12 @@
                         <div class="menu_section">
                             <h3>General</h3>
                             <ul class="nav side-menu">
-                                <li><a><i class="fa fa-home"></i> home <span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu">
-                                        <li><a href="index.html">Index</a></li>
-                                        <li><a href="inventario.html">Inventario</a></li>
-                                        <li><a href="producto.html">Nuevo Producto</a></li>
-                                        <li><a href="categoria.html">Categorías</a></li>
-                                        <li><a href="facturacion.html">Facturación</a></li>
-                                    </ul>
+                                <li>
+                                    <a>
+                                        <i class="fa fa-home"></i> home
+                                        <span class="fa fa-chevron-down"></span>
+                                    </a>
+                                    <ul class="nav child_menu" id="call_menu"></ul>
                                 </li>
 
                             </ul>
@@ -76,17 +85,17 @@
                     <!-- /menu footer buttons -->
                     <div class="sidebar-footer hidden-small">
                         <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        </a>
                         <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
+                            <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                        </a>
                         <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-                        <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Logout" onclick="Session.End();">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </a>
                     </div>
                     <!-- /menu footer buttons -->
                 </div>
@@ -97,25 +106,25 @@
                 <div class="nav_menu">
                     <nav>
                         <div class="nav toggle">
-                            <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                            <a id="menu_toggle">
+                                <i class="fa fa-bars"></i>
+                            </a>
                         </div>
 
                         <ul class="nav navbar-nav navbar-right">
                             <li class="">
-                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="images/user.png" alt="">Nombre usuario
-                    <span class=" fa fa-angle-down"></span>
-                  </a>
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id='call_username'>
+                                    <img src="images/user.png" alt="">
+                                    <span class=" fa fa-angle-down"></span>
+                                </a>
                                 <ul class="dropdown-menu dropdown-usermenu pull-right">
-                                    <li><a href="javascript:;"> Profile</a></li>
                                     <li>
-                                        <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
+                                        <a href="javascript:;"> Profile</a>
                                     </li>
-                                    <li><a href="javascript:;">Help</a></li>
-                                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                    <li>
+                                        <a onclick="Session.End();">
+                                            <i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                                    </li>
                                 </ul>
                             </li>
 
@@ -157,7 +166,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!--  CONTENIDO DE LA PAGINA -->                                 
+                                <!--  CONTENIDO DE LA PAGINA -->
                                 <div class="x_content">
                                     <div class="table-responsive">
                                         <table id="prd" class="table table-striped jambo_table bulk_action">
@@ -171,22 +180,22 @@
                                                     <th class="column-title">Precio/U </th>
                                                     <th class="column-title">Cantidad </th>
                                                     <th class="column-title">Importe </th> -->
-                                                <!--<th class="column-title">Amount </th>
+                                            <!--<th class="column-title">Amount </th>
                                                     <th class="column-title no-link last"><span class="nobr">Action</span>
                                                     </th> -->
-                                                    <!-- <th class="bulk-actions" colspan="7">
+                                            <!-- <th class="bulk-actions" colspan="7">
                                                     <a class="antoo" style="color:#fff; font-weight:500;">Acciones Masivas ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
                                                     </th>
                                                 </tr>
                                             </thead> -->
                                             <tbody id="productos">
-                                                                                                           
+
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
 
-                                <!--  CONTENIDO DE SUBTOTALES -->                                 
+                                <!--  CONTENIDO DE SUBTOTALES -->
                                 <div class="row">
                                     <div class="col-10 col-sm-7 col-md-6 col-lg-4 col-xl-4 offset-1 offset-sm-4 offset-lg-8 offset-xl-8 subtotales">
                                         <div class="x_content">
@@ -195,30 +204,31 @@
                                                     <tbody>
                                                         <tr class="even pointer">
                                                             <td class="">SubTotal</td>
-                                                            <td class="">  </td>
-                                                            <td class="" id= "subtotal">¢0</td>
+                                                            <td class=""> </td>
+                                                            <td class="" id="subtotal">¢0</td>
                                                         </tr>
                                                         <tr class="odd pointer">
                                                             <td class="">Descuento</td>
                                                             <td class="" id="desc_100">0%</td>
                                                             <td class="" id="desc_val">¢0</td>
-                                                        </tr><tr class="even pointer">
-                                                                <td class="">Impuesto de Ventas</td>
-                                                                <td class="text-left" id="iv_100">13% </td>
-                                                                <td class="" id="iv_val">¢0</td>
+                                                        </tr>
+                                                        <tr class="even pointer">
+                                                            <td class="">Impuesto de Ventas</td>
+                                                            <td class="text-left" id="iv_100">13% </td>
+                                                            <td class="" id="iv_val">¢0</td>
                                                         </tr>
                                                         <tr class="odd pointer">
                                                             <td class="">TOTAL</td>
                                                             <td class=""></td>
                                                             <td class="" id="total">¢0</td>
                                                         </tr>
-                                                    </tbody>                                                        
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!--  CONTENIDO DE SUBTOTALES -->  
+                                <!--  CONTENIDO DE SUBTOTALES -->
                             </div>
                         </div>
                     </div>
@@ -239,7 +249,8 @@
             <!-- footer content -->
             <footer>
                 <div class="pull-right">
-                    Ventas y administración de Inventario <a href="http://faccr.com">Fac-CR</a>
+                    Ventas y administración de Inventario
+                    <a href="http://faccr.com">Fac-CR</a>
                 </div>
                 <div class="clearfix"></div>
             </footer>
@@ -253,7 +264,8 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content modal-factura">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
                     </button>
                     <h4 class="modal-title" id="myModalLabel">Facturar</h4>
                 </div>
@@ -261,26 +273,26 @@
                     <div class="row">
                         <div>
                             <center>
-                                    <h1 id="total_pagar"></h1>    
+                                <h1 id="total_pagar"></h1>
                             </center>
-                            
+
                         </div>
                     </div>
                     <div class="row">
                         <div id="formapago">
-                           
+
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <div id="btn-formapago">
-                       
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-  <!-- modals -->
+    <!-- modals -->
     <!-- Large modal -->
 
     <!-- jQuery -->
@@ -290,7 +302,7 @@
     <!-- FastClick -->
     <script src="assets/js/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="assets/js/nprogress/nprogress.js"></script>    
+    <script src="assets/js/nprogress/nprogress.js"></script>
     <!-- iCheck -->
     <script src="assets/js/iCheck/icheck.min.js"></script>
     <!-- Validator -->
@@ -311,4 +323,5 @@
     <script src="assets/js/sweetalert2.min.js"></script>
 
 </body>
+
 </html>

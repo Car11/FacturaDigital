@@ -268,7 +268,7 @@ function facCard (){
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            <input class="input-lg valPago" type="text" onkeyup="valPago(this.value)" placeholder="Ingrese Numero Referencia" required="" minlength="5" autofocus="">
+            <input class="input-lg valPago" type="number" onkeyup="valPago(this.value)" placeholder="Ingrese Numero Referencia" required="" minlength="5" autofocus="">
         </div>
     </div>
     <div class="row">
@@ -297,7 +297,7 @@ function facCash(){
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            <input id="pagocash" class="input-lg valPago" onkeyup="valPago(this.value)" type="text" placeholder="Ingrese Monto en Efectivo"  required="" minlength="5" autofocus="">
+            <input id="pagocash" class="input-lg valPago" onkeyup="valPago(this.value)" type="number" placeholder="Ingrese Monto en Efectivo"  required="" minlength="5" autofocus="">
         </div>
     </div>
     <div class="row">
